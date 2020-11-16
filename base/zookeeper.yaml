@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app kafka-zookeeper-headless
+  labels:
+    app: kafka-zookeeper
+spec:
+  ports:
+  - port: 2888
+    name: server
+  - port: 3888
+    name: leader-election
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: kafka-zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app kafka-zookeeper
+  labels:
+    app: *app
+spec:
+  ports:
+  - port: 2181
+    name: client
+  selector:
+    app: *app
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: &app kafka-zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &app kafka-zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: *app
+  serviceName: kafka-zookeeper-headless
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: *app
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - *app
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: *app
+        image: zookeeper:3.6
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: client
+          containerPort: 2181
+        - name: server
+          containerPort: 2888
+        - name: leader-election
+          containerPort: 3888
+        command:
+           - /bin/bash
+           - -ecx
+           - |
+             echo "$((${HOSTNAME: -1} + 1))" > /data/myid
+             export JMXPORT=9090 && export JMXDISABLE='false' && exec bin/zkServer.sh start-foreground
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "bin/zkServer.sh status"
+          initialDelaySeconds: 15
+          failureThreshold: 10
+          periodSeconds: 20
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "bin/zkServer.sh status"
+          initialDelaySeconds: 15
+          failureThreshold: 10
+          periodSeconds: 20
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: datadir
+          mountPath: /data
+        - name: logdir
+          mountPath: /datalog
+        - name: config
+          mountPath: /conf
+      volumes:
+      - name: config
+        configMap:
+          name: *app
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+  - metadata:
+      name: logdir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: &app kafka-zookeeper
+data:
+  zoo.cfg: |-
+    tickTime=2000
+    dataDir=/data
+    clientPort=2181
+    initLimit=200
+    syncLimit=20
+    server.1=kafka-zookeeper-0.kafka-zookeeper-headless:2888:3888
+    server.2=kafka-zookeeper-1.kafka-zookeeper-headless:2888:3888
+    server.3=kafka-zookeeper-2.kafka-zookeeper-headless:2888:3888
+    log4j.configuration=file:///conf/log4j.properties
+    /data/myid
+  log4j.properties: |-
+    log4j.rootLogger=WARN, stdout
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.Target=System.out
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+---

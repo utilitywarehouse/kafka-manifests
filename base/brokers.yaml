@@ -1,0 +1,284 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path:   /metrics
+    prometheus.io/port:   '5555'
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  name: broker
+spec:
+  ports:
+  - port: 9092
+  clusterIP: None
+  selector:
+    app: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path:   /__/metrics
+    prometheus.io/port:   '8081'
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  name: kafka-ebs-monitor
+spec:
+  ports:
+  - port: 9092
+  clusterIP: None
+  selector:
+    app: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app kafka
+spec:
+  ports:
+  - port: 9092
+  selector:
+    app: *app
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: &app kafka
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: *app
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &app kafka
+spec:
+  serviceName: "broker"
+  replicas: 5
+  selector:
+    matchLabels:
+      app: *app
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: *app
+        project: core
+    spec:
+      terminationGracePeriodSeconds: 300
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - *app
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: ebs-monitor
+        imagePullPolicy: IfNotPresent
+        image: registry.uw.systems/telecom/disk-usage-monitor:latest
+        livenessProbe:
+          httpGet:
+          # We consider app to be healthy as long as it can serve metrics. This is because
+          # if there was a problem with EBS volume, kubernetes wouldn't start the container.
+            path: /__/metrics
+            port: 8081
+          initialDelaySeconds: 15
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /__/ready
+            port: 8081
+          initialDelaySeconds: 15
+          timeoutSeconds: 10
+        env:
+          - name: LOG_LEVEL
+            value: "info"
+          - name: HTTP_PORT
+            value: "8081"
+          - name: MOUNT_PATHS
+            value: "/opt/kafka/data"
+          - name: CHECK_INTERVAL
+            value: "10"
+        resources:
+          requests:
+            cpu: 0
+            memory: 0
+          limits:
+            cpu: 50m
+            memory: 50Mi
+        volumeMounts:
+        - name: datadir
+          mountPath: /opt/kafka/data
+      - name: broker
+        imagePullPolicy: IfNotPresent
+        image: quay.io/utilitywarehouse/uw-kafka:v2.6.0
+        command:
+          - sh
+          - -ecx
+          - export JMX_PORT=9090 && exec ./kafka-server-start.sh ../config/server.properties --override broker.id=$(hostname | awk -F'-' '{print $2}')
+        env:
+          - name: KAFKA_HEAP_OPTS
+            value: "-Xmx1G -Xms1G"
+          - name: JMX_PORT
+            value: "9090"
+        ports:
+        - containerPort: 9092
+        resources:
+          requests:
+            cpu: 400m
+            memory: 400Mi
+          limits:
+            cpu: 4000m
+            memory: 4000Mi
+        readinessProbe:
+          failureThreshold: 10
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+          exec:
+           command:
+            - sh
+            - -c
+            - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
+        livenessProbe:
+          failureThreshold: 10
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+          exec:
+           command:
+            - sh
+            - -c
+            - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
+        volumeMounts:
+        - name: datadir
+          mountPath: /opt/kafka/data
+        - name: kafka-configmap
+          mountPath: /opt/kafka/config
+      - name: jmx-exporter
+        image: quay.io/utilitywarehouse/jmx_exporter:0.11.0
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: PORT
+            value: '8080'
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: jmx-exporter-configmap
+          mountPath: /app/config
+      volumes:
+        - name: kafka-configmap
+          configMap:
+            name: kafka-configmap
+        - name: jmx-exporter-configmap
+          configMap:
+            name: jmx-exporter-configmap
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 200Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-configmap
+data:
+  server.properties: |-
+    auto.create.topics.enable=true
+    broker.id=0
+    default.replication.factor=3
+    delete.topic.enable=true
+    log.cleaner.delete.retention.ms=60000
+    log.dirs=/opt/kafka/data/logs
+    log.flush.offset.checkpoint.interval.ms=10000
+    log.retention.check.interval.ms=60000
+    log.segment.bytes=524288000
+    message.max.bytes=2000012
+    min.insync.replicas=2
+
+    log.retention.ms=-1
+    log.retention.bytes=-1
+
+    num.network.threads=3
+    num.partitions=15
+    num.recovery.threads.per.data.dir=8
+    offsets.retention.minutes=20160
+    offsets.topic.replication.factor=3
+    replica.fetch.max.bytes=2048576
+    replica.fetch.response.max.bytes=2048576
+    unclean.leader.election.enable=false
+    zookeeper.connect=kafka-zookeeper:2181/kafka
+
+  log4j.properties: |-
+    log4j.rootLogger=WARN, stdout
+
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.kafkaAppender=org.apache.log4j.ConsoleAppender
+    log4j.appender.kafkaAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.kafkaAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.stateChangeAppender=org.apache.log4j.ConsoleAppender
+    log4j.appender.stateChangeAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stateChangeAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.requestAppender=org.apache.log4j.ConsoleAppender
+    log4j.appender.requestAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.requestAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.cleanerAppender=org.apache.log4j.ConsoleAppender
+    log4j.appender.cleanerAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.cleanerAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.controllerAppender=org.apache.log4j.ConsoleAppender
+    log4j.appender.controllerAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.controllerAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.appender.authorizerAppender=org.apache.log4j.ConsoleAppender
+    log4j.appender.authorizerAppender.layout=org.apache.log4j.PatternLayout
+    log4j.appender.authorizerAppender.layout.ConversionPattern=[%d] %p %m (%c)%n
+
+    log4j.logger.kafka=WARN, kafkaAppender
+    log4j.logger.kafka.network.RequestChannel$=WARN, requestAppender
+    log4j.additivity.kafka.network.RequestChannel$=false
+    log4j.logger.kafka.request.logger=WARN, requestAppender
+    log4j.additivity.kafka.request.logger=false
+    log4j.logger.kafka.controller=WARN, controllerAppender
+    log4j.additivity.kafka.controller=false
+    log4j.logger.kafka.log.LogCleaner=WARN, cleanerAppender
+    log4j.additivity.kafka.log.LogCleaner=false
+    log4j.logger.state.change.logger=WARN, stateChangeAppender
+    log4j.additivity.state.change.logger=false
+    log4j.logger.kafka.authorizer.logger=WARN, authorizerAppender
+    log4j.additivity.kafka.authorizer.logger=false
+  tools-log4j.properties: |-
+    log4j.rootLogger=WARN, stderr
+    log4j.appender.stderr=org.apache.log4j.ConsoleAppender
+    log4j.appender.stderr.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stderr.layout.ConversionPattern=[%d] %p %m (%c)%n
+    log4j.appender.stderr.Target=System.err
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmx-exporter-configmap
+data:
+  config.yml: |-
+    ---
+    hostPort: localhost:9090
+    rules:
+    - pattern: ".*"
