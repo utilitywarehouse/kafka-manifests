@@ -1,31 +1,23 @@
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/path:   /metrics
-    prometheus.io/port:   '5555'
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-  name: broker
-spec:
-  ports:
-  - port: 9092
-  clusterIP: None
-  selector:
-    app: kafka
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  name: broker
+  labels:
+    app: kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/part-of: kafka
   annotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/path:   /__/metrics
-    prometheus.io/port:   '8081'
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-  name: kafka-ebs-monitor
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "5555"
 spec:
   ports:
-  - port: 9092
+    - port: 9092
+      protocol: TCP
+      targetPort: 9092
+  publishNotReadyAddresses: true
   clusterIP: None
   selector:
     app: kafka
@@ -34,28 +26,46 @@ apiVersion: v1
 kind: Service
 metadata:
   name: &app kafka
+  labels:
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/part-of: kafka
 spec:
   ports:
-  - port: 9092
+    - port: 9092
+      protocol: TCP
+      targetPort: 9092
+  publishNotReadyAddresses: true
   selector:
-    app: *app
+    app: kafka
 ---
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: &app kafka
+  labels:
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/part-of: kafka
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: *app
+      app: kafka
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: &app kafka
+  labels:
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/part-of: kafka
 spec:
-  serviceName: "broker"
+  serviceName: broker
   replicas: 5
   selector:
     matchLabels:
@@ -70,125 +80,111 @@ spec:
       terminationGracePeriodSeconds: 300
       affinity:
         podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - *app
-            topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - *app
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - *app
+                topologyKey: kubernetes.io/hostname
       containers:
-      - name: ebs-monitor
-        imagePullPolicy: IfNotPresent
-        image: registry.uw.systems/telecom/disk-usage-monitor:latest
-        livenessProbe:
-          httpGet:
-          # We consider app to be healthy as long as it can serve metrics. This is because
-          # if there was a problem with EBS volume, kubernetes wouldn't start the container.
-            path: /__/metrics
-            port: 8081
-          initialDelaySeconds: 15
-          timeoutSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /__/ready
-            port: 8081
-          initialDelaySeconds: 15
-          timeoutSeconds: 10
-        env:
-          - name: LOG_LEVEL
-            value: "info"
-          - name: HTTP_PORT
-            value: "8081"
-          - name: MOUNT_PATHS
-            value: "/opt/kafka/data"
-          - name: CHECK_INTERVAL
-            value: "10"
-        resources:
-          requests:
-            cpu: 0
-            memory: 0
-          limits:
-            cpu: 50m
-            memory: 50Mi
-        volumeMounts:
-        - name: datadir
-          mountPath: /opt/kafka/data
-      - name: broker
-        imagePullPolicy: IfNotPresent
-        image: quay.io/utilitywarehouse/uw-kafka:v2.6.0
-        command:
-          - sh
-          - -ecx
-          - export JMX_PORT=9090 && exec ./kafka-server-start.sh ../config/server.properties --override broker.id=$(hostname | awk -F'-' '{print $2}')
-        env:
-          - name: KAFKA_HEAP_OPTS
-            value: "-Xmx1G -Xms1G"
-          - name: JMX_PORT
-            value: "9090"
-        ports:
-        - containerPort: 9092
-        resources:
-          requests:
-            cpu: 400m
-            memory: 400Mi
-          limits:
-            cpu: 4000m
-            memory: 4000Mi
-        readinessProbe:
-          failureThreshold: 10
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 15
-          exec:
-           command:
+        - name: broker
+          command:
             - sh
-            - -c
-            - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
-        livenessProbe:
-          failureThreshold: 10
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 15
-          exec:
-           command:
-            - sh
-            - -c
-            - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
-        volumeMounts:
-        - name: datadir
-          mountPath: /opt/kafka/data
-        - name: kafka-configmap
-          mountPath: /opt/kafka/config
-      - name: jmx-exporter
-        image: quay.io/utilitywarehouse/jmx_exporter:0.11.0
-        imagePullPolicy: IfNotPresent
-        env:
-          - name: PORT
-            value: '8080'
-        ports:
-        - containerPort: 8080
-        volumeMounts:
-        - name: jmx-exporter-configmap
-          mountPath: /app/config
+            - -ecx
+            - export JMX_PORT=9090 && exec ./kafka-server-start.sh ../config/server.properties --override broker.id=$(hostname | awk -F'-' '{print $2}')
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx2G -Xms2G
+          image: quay.io/utilitywarehouse/uw-kafka:v3.0.0
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            failureThreshold: 10
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+            exec:
+              command:
+                - sh
+                - -c
+                - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
+          livenessProbe:
+            failureThreshold: 10
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 15
+            exec:
+              command:
+                - sh
+                - -c
+                - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
+          ports:
+            - containerPort: 9092
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 0m
+              memory: 1500Mi
+            limits:
+              cpu: 2000m
+              memory: 4000Mi
+          volumeMounts:
+            - mountPath: /opt/kafka/data
+              name: datadir
+            - mountPath: /opt/kafka/config
+              name: kafka-configmap
+        - name: jmx-exporter
+          image: quay.io/utilitywarehouse/jmx_exporter:0.14.0-1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8080"
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 450Mi
+            limits:
+              cpu: 1
+              memory: 768Mi
+          volumeMounts:
+            - mountPath: /app/config
+              name: jmx-exporter-configmap
       volumes:
-        - name: kafka-configmap
-          configMap:
+        - configMap:
+            defaultMode: 420
             name: kafka-configmap
-        - name: jmx-exporter-configmap
-          configMap:
+          name: kafka-configmap
+        - configMap:
+            defaultMode: 420
             name: jmx-exporter-configmap
+          name: jmx-exporter-configmap
   volumeClaimTemplates:
-  - metadata:
-      name: datadir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 200Gi
+    - metadata:
+        name: datadir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Gi
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -196,31 +192,36 @@ metadata:
   name: kafka-configmap
 data:
   server.properties: |-
-    auto.create.topics.enable=true
+    # https://kafka.apache.org/documentation/#brokerconfigs
     broker.id=0
     default.replication.factor=3
     delete.topic.enable=true
-    log.cleaner.delete.retention.ms=60000
+    auto.create.topics.enable=false
+    socket.send.buffer.bytes=102400
+    socket.receive.buffer.bytes=102400
+    socket.request.max.bytes=104857600
     log.dirs=/opt/kafka/data/logs
     log.flush.offset.checkpoint.interval.ms=10000
-    log.retention.check.interval.ms=60000
     log.segment.bytes=524288000
-    message.max.bytes=2000012
+    log.message.format.version=3.0.0
+    message.max.bytes=134217728
     min.insync.replicas=2
-
     log.retention.ms=-1
     log.retention.bytes=-1
-
     num.network.threads=3
+    num.io.threads=8
     num.partitions=15
     num.recovery.threads.per.data.dir=8
-    offsets.retention.minutes=20160
+    offsets.retention.minutes=525600
     offsets.topic.replication.factor=3
-    replica.fetch.max.bytes=2048576
-    replica.fetch.response.max.bytes=2048576
+    replica.fetch.max.bytes=134217728
+    replica.fetch.response.max.bytes=134217728
+    replica.socket.timeout.ms=60000
+    replica.socket.receive.buffer.bytes=102400
+    fetch.message.max.bytes=134217728
     unclean.leader.election.enable=false
     zookeeper.connect=kafka-zookeeper:2181/kafka
-
+    zookeeper.connection.timeout.ms=10000
   log4j.properties: |-
     log4j.rootLogger=WARN, stdout
 
