@@ -6,10 +6,10 @@ metadata:
     app: kafka-zookeeper
 spec:
   ports:
-  - port: 2888
-    name: server
-  - port: 3888
-    name: leader-election
+    - port: 2888
+      name: server
+    - port: 3888
+      name: leader-election
   clusterIP: None
   publishNotReadyAddresses: true
   selector:
@@ -23,12 +23,12 @@ metadata:
     app: *app
 spec:
   ports:
-  - port: 2181
-    name: client
+    - port: 2181
+      name: client
   selector:
     app: *app
 ---
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: &app kafka-zookeeper
@@ -64,71 +64,76 @@ spec:
                   - key: "app"
                     operator: In
                     values:
-                    - *app
+                      - *app
               topologyKey: "kubernetes.io/hostname"
       containers:
-      - name: *app
-        image: zookeeper:3.6
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: client
-          containerPort: 2181
-        - name: server
-          containerPort: 2888
-        - name: leader-election
-          containerPort: 3888
-        command:
-           - /bin/bash
-           - -ecx
-           - |
-             echo "$((${HOSTNAME: -1} + 1))" > /data/myid
-             export JMXPORT=9090 && export JMXDISABLE='false' && exec bin/zkServer.sh start-foreground
-        readinessProbe:
-          exec:
-            command:
-            - sh
-            - -c
-            - "bin/zkServer.sh status"
-          initialDelaySeconds: 15
-          failureThreshold: 10
-          periodSeconds: 20
-          timeoutSeconds: 5
-        livenessProbe:
-          exec:
-            command:
-            - sh
-            - -c
-            - "bin/zkServer.sh status"
-          initialDelaySeconds: 15
-          failureThreshold: 10
-          periodSeconds: 20
-          timeoutSeconds: 5
-        volumeMounts:
-        - name: datadir
-          mountPath: /data
-        - name: logdir
-          mountPath: /datalog
-        - name: config
-          mountPath: /conf
+        - name: *app
+          image: zookeeper:3.7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: client
+              containerPort: 2181
+            - name: server
+              containerPort: 2888
+            - name: leader-election
+              containerPort: 3888
+          command:
+            - /bin/bash
+            - -ecx
+            - |
+              echo "$((${HOSTNAME: -1} + 1))" > /data/myid
+              export JMXPORT=9090 && export JMXDISABLE='false' && exec bin/zkServer.sh start-foreground
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "bin/zkServer.sh status"
+            initialDelaySeconds: 15
+            failureThreshold: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "bin/zkServer.sh status"
+            initialDelaySeconds: 15
+            failureThreshold: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: datadir
+              mountPath: /data
+            - name: logdir
+              mountPath: /datalog
+            - name: config
+              mountPath: /conf
+          resources:
+            requests:
+              memory: 80Mi
+            limits:
+              memory: 200Mi
       volumes:
-      - name: config
-        configMap:
-          name: *app
+        - name: config
+          configMap:
+            name: *app
   volumeClaimTemplates:
-  - metadata:
-      name: datadir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 10Gi
-  - metadata:
-      name: logdir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 10Gi
+    - metadata:
+        name: datadir
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+    - metadata:
+        name: logdir
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
 ---
 apiVersion: v1
 kind: ConfigMap
