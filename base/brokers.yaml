@@ -223,6 +223,8 @@ data:
     zookeeper.connect=kafka-zookeeper:2181/kafka
     zookeeper.connection.timeout.ms=10000
   log4j.properties: |-
+    log4j2.formatMsgNoLookups=true
+
     log4j.rootLogger=WARN, stdout
 
     log4j.appender.stdout=org.apache.log4j.ConsoleAppender
