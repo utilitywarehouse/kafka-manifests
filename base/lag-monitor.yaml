@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: &app kafka-lag-monitor
+  name: kafka-lag-monitor
   annotations:
     prometheus.io/path: "/__/metrics"
     prometheus.io/port: "8081"
     prometheus.io/scrape: "true"
   labels:
-    app: *app
-    app.kubernetes.io/name: *app
+    app: kafka-lag-monitor
+    app.kubernetes.io/name: kafka-lag-monitor
     app.kubernetes.io/component: lag-monitor
     app.kubernetes.io/part-of: kafka
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: *app
+      app: kafka-lag-monitor
   template:
     metadata:
-      name: *app
+      name: kafka-lag-monitor
       labels:
-        app: *app
-        app.kubernetes.io/name: *app
+        app: kafka-lag-monitor
+        app.kubernetes.io/name: kafka-lag-monitor
         app.kubernetes.io/component: lag-monitor
         app.kubernetes.io/part-of: kafka
     spec:
       containers:
-        - name: *app
+        - name: kafka-lag-monitor
           image: registry.uw.systems/telecom/kafka-lag-monitor:latest
           imagePullPolicy: IfNotPresent
           env:

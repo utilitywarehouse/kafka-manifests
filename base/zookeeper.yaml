@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app kafka-zookeeper-headless
+  name: kafka-zookeeper-headless
   labels:
     app: kafka-zookeeper
 spec:
@@ -18,34 +18,34 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app kafka-zookeeper
+  name: kafka-zookeeper
   labels:
-    app: *app
+    app: kafka-zookeeper
 spec:
   ports:
     - port: 2181
       name: client
   selector:
-    app: *app
+    app: kafka-zookeeper
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: &app kafka-zookeeper
+  name: kafka-zookeeper
 spec:
   selector:
     matchLabels:
-      app: *app
+      app: kafka-zookeeper
   maxUnavailable: 1
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: &app kafka-zookeeper
+  name: kafka-zookeeper
 spec:
   selector:
     matchLabels:
-      app: *app
+      app: kafka-zookeeper
   serviceName: kafka-zookeeper-headless
   replicas: 3
   updateStrategy:
@@ -54,7 +54,7 @@ spec:
   template:
     metadata:
       labels:
-        app: *app
+        app: kafka-zookeeper
     spec:
       affinity:
         podAntiAffinity:
@@ -64,10 +64,10 @@ spec:
                   - key: "app"
                     operator: In
                     values:
-                      - *app
+                      - kafka-zookeeper
               topologyKey: "kubernetes.io/hostname"
       containers:
-        - name: *app
+        - name: kafka-zookeeper
           image: zookeeper:3.7
           imagePullPolicy: IfNotPresent
           ports:
@@ -118,7 +118,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: *app
+            name: kafka-zookeeper
   volumeClaimTemplates:
     - metadata:
         name: datadir
@@ -138,7 +138,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: &app kafka-zookeeper
+  name: kafka-zookeeper
 data:
   zoo.cfg: |-
     tickTime=2000

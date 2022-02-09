@@ -25,10 +25,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app kafka
+  name: kafka
   labels:
-    app: *app
-    app.kubernetes.io/name: *app
+    app: kafka
+    app.kubernetes.io/name: kafka
     app.kubernetes.io/component: broker
     app.kubernetes.io/part-of: kafka
 spec:
@@ -43,10 +43,10 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: &app kafka
+  name: kafka
   labels:
-    app: *app
-    app.kubernetes.io/name: *app
+    app: kafka
+    app.kubernetes.io/name: kafka
     app.kubernetes.io/component: broker
     app.kubernetes.io/part-of: kafka
 spec:
@@ -58,10 +58,10 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: &app kafka
+  name: kafka
   labels:
-    app: *app
-    app.kubernetes.io/name: *app
+    app: kafka
+    app.kubernetes.io/name: kafka
     app.kubernetes.io/component: broker
     app.kubernetes.io/part-of: kafka
 spec:
@@ -69,12 +69,12 @@ spec:
   replicas: 5
   selector:
     matchLabels:
-      app: *app
+      app: kafka
   podManagementPolicy: Parallel
   template:
     metadata:
       labels:
-        app: *app
+        app: kafka
         project: core
     spec:
       terminationGracePeriodSeconds: 300
@@ -88,7 +88,7 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - *app
+                        - kafka
                 topologyKey: failure-domain.beta.kubernetes.io/zone
             - weight: 100
               podAffinityTerm:
@@ -97,7 +97,7 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - *app
+                        - kafka
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: broker
