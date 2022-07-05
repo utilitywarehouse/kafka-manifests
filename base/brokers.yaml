@@ -121,17 +121,6 @@ spec:
                 - sh
                 - -c
                 - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
-          livenessProbe:
-            failureThreshold: 10
-            initialDelaySeconds: 60
-            periodSeconds: 30
-            successThreshold: 1
-            timeoutSeconds: 15
-            exec:
-              command:
-                - sh
-                - -c
-                - "unset JMX_PORT && /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9092"
           ports:
             - containerPort: 9092
               protocol: TCP
