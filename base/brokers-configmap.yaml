@@ -4,4 +4,4 @@ metadata:
   name: kafka-brokers
 data:
   internal.kafka.brokers: kafka-0.broker:9092,kafka-1.broker:9092,kafka-2.broker:9092,kafka-3.broker:9092,kafka-4.broker:9092
-  internal.kafka.broker.version: 3.1.0
+  internal.kafka.broker.version: 3.2.0
