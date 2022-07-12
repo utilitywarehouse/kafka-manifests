@@ -192,7 +192,7 @@ data:
     log.dirs=/opt/kafka/data/logs
     log.flush.offset.checkpoint.interval.ms=10000
     log.segment.bytes=524288000
-    log.message.format.version=3.0.0
+    log.message.format.version=3.2.0
     message.max.bytes=134217728
     min.insync.replicas=2
     log.retention.ms=-1
