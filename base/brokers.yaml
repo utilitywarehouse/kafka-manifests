@@ -139,13 +139,6 @@ spec:
         - name: jmx-exporter
           image: quay.io/utilitywarehouse/jmx_exporter:0.14.0-1
           imagePullPolicy: IfNotPresent
-          env:
-            - name: PORT
-              value: "8080"
-          ports:
-            - containerPort: 8080
-              name: http
-              protocol: TCP
           resources:
             requests:
               cpu: 10m
