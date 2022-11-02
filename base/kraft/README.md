@@ -6,4 +6,7 @@ With the release of Kafka [3.3.1](https://kafka.apache.org/downloads#3.3.1) KRaf
 * [split](split): in this mode there are separate statefulsets for brokers and controllers.
 
 More:
-* [Documentation](https://kafka.apache.org/documentation.html#kraft)
+* [Getting Started](https://kafka.apache.org/documentation.html#quickstart_startserver)
+* [Configuration](https://kafka.apache.org/documentation.html#kraft)
+* [Monitoring](https://kafka.apache.org/documentation.html#kraft_monitoring)
+* [Sample Config files](https://github.com/apache/kafka/tree/trunk/config/kraft)

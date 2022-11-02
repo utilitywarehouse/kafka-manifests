@@ -15,5 +15,9 @@ $ docker run -ti quay.io/utilitywarehouse/uw-kafka:v3.3.1 sh -- ./kafka-storage.
 B3PgICDlRNiGaaqnEPSQ6w
 ```
 
-2. Update broker and controller container cmd by setting CLUSTER_ID to the above generated token.
+2. Update broker and controller container cmd by setting `CLUSTER_ID` to the above generated token.
 3. Apply the resource manifests.
+
+## Notes
+
+A Kafka cluster requires each member to have a unique `node.id`. By convention, brokers are indexed from `0`, while controllers from `100`.
