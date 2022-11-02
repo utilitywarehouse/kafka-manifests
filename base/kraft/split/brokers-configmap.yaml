@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-brokers
+data:
+  internal.kafka.brokers: broker-0.broker:9092,broker-1.broker:9092,broker-2.broker:9092,broker-3.broker:9092,broker-4.broker:9092
+  internal.kafka.broker.version: 3.3.1
