@@ -5,8 +5,8 @@ kind: Service
 metadata:
   name: broker
   labels:
-    app: kafka
-    app.kubernetes.io/name: kafka
+    app: broker
+    app.kubernetes.io/name: broker
     app.kubernetes.io/component: broker
     app.kubernetes.io/part-of: kafka
   annotations:
@@ -30,8 +30,8 @@ kind: Service
 metadata:
   name: controller
   labels:
-    app: kafka
-    app.kubernetes.io/name: kafka
+    app: controller
+    app.kubernetes.io/name: controller
     app.kubernetes.io/component: controller
     app.kubernetes.io/part-of: kafka
   annotations:
