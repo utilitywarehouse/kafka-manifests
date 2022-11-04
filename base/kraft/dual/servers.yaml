@@ -3,12 +3,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: broker
+  name: &app kafka
   labels:
-    app: kafka
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/component: broker
-    app.kubernetes.io/part-of: kafka
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: *app
+    app.kubernetes.io/part-of: *app
 spec:
   ports:
     - name: broker
@@ -58,7 +58,7 @@ metadata:
   labels:
     app: kafka
     app.kubernetes.io/name: kafka
-    app.kubernetes.io/component: broker
+    app.kubernetes.io/component: controller
     app.kubernetes.io/part-of: kafka
   annotations:
     prometheus.io/scrape: "true"
@@ -81,8 +81,8 @@ metadata:
   labels:
     app: *app
     app.kubernetes.io/name: *app
-    app.kubernetes.io/component: broker
-    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/component: *app
+    app.kubernetes.io/part-of: *app
 spec:
   maxUnavailable: 1
   selector:
@@ -96,10 +96,10 @@ metadata:
   labels:
     app: *app
     app.kubernetes.io/name: *app
-    app.kubernetes.io/component: broker
-    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/component: *app
+    app.kubernetes.io/part-of: *app
 spec:
-  serviceName: broker
+  serviceName: kafka
   replicas: 5
   selector:
     matchLabels:

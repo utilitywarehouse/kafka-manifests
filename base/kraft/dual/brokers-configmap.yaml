@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: kafka-brokers
 data:
-  internal.kafka.brokers: kafka-0.broker:9092,kafka-1.broker:9092,kafka-2.broker:9092,kafka-3.broker:9092,kafka-4.broker:9092
+  internal.kafka.broker: kafka-0.kafka:9092,kafka-1.kafka:9092,kafka-2.kafka:9092,kafka-3.kafka:9092,kafka-4.kafka:9092
   internal.kafka.broker.version: 3.3.1
