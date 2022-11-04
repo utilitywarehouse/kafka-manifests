@@ -37,7 +37,7 @@ metadata:
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: "/metrics"
-    prometheus.io/port: "5556"
+    prometheus.io/port: "5555"
 spec:
   ports:
     - name: controller
@@ -147,7 +147,7 @@ spec:
         - name: jmx-exporter
           image: quay.io/utilitywarehouse/jmx_exporter:0.14.0-1
           imagePullPolicy: IfNotPresent
-          command: ["java", "-jar", "jmx_prometheus_httpserver.jar" , "5556", "/app/config/controller.yml"]
+          command: ["java", "-jar", "jmx_prometheus_httpserver.jar" , "5555", "/app/config/controller.yml"]
           resources:
             requests:
               cpu: 10m
