@@ -3,11 +3,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: broker
+  name: &app broker
   labels:
-    app: broker
-    app.kubernetes.io/name: broker
-    app.kubernetes.io/component: broker
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: *app
     app.kubernetes.io/part-of: kafka
   annotations:
     prometheus.io/scrape: "true"
@@ -22,17 +22,17 @@ spec:
   publishNotReadyAddresses: true
   clusterIP: None
   selector:
-    app: broker
+    app: *app
 ---
 # Headless service to be used for controller-broker and controller-controller communication.
 apiVersion: v1
 kind: Service
 metadata:
-  name: controller
+  name: &app controller
   labels:
-    app: controller
-    app.kubernetes.io/name: controller
-    app.kubernetes.io/component: controller
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: *app
     app.kubernetes.io/part-of: kafka
   annotations:
     prometheus.io/scrape: "true"
@@ -47,7 +47,7 @@ spec:
   publishNotReadyAddresses: true
   clusterIP: None
   selector:
-    app: controller
+    app: *app
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -72,7 +72,7 @@ metadata:
   labels:
     app: *app
     app.kubernetes.io/name: *app
-    app.kubernetes.io/component: controller
+    app.kubernetes.io/component: *app
     app.kubernetes.io/part-of: kafka
 spec:
   serviceName: controller
@@ -185,7 +185,7 @@ metadata:
   labels:
     app: *app
     app.kubernetes.io/name: *app
-    app.kubernetes.io/component: broker
+    app.kubernetes.io/component: *app
     app.kubernetes.io/part-of: kafka
 spec:
   serviceName: broker
