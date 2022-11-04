@@ -141,7 +141,7 @@ spec:
               memory: 5000Mi
           volumeMounts:
             - mountPath: /opt/kafka/data
-              name: metadatadir
+              name: datadir
             - mountPath: /opt/kafka/config
               name: kafka-configmap
         - name: jmx-exporter
@@ -169,7 +169,7 @@ spec:
           name: jmx-exporter-configmap
   volumeClaimTemplates:
     - metadata:
-        name: metadatadir
+        name: datadir
       spec:
         accessModes:
           - ReadWriteOnce
