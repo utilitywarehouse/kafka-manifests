@@ -2,10 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: &app kafka-lag-monitor
-  annotations:
-    prometheus.io/path: "/__/metrics"
-    prometheus.io/port: "8081"
-    prometheus.io/scrape: "true"
   labels:
     app: *app
     app.kubernetes.io/name: *app
@@ -19,6 +15,10 @@ spec:
   template:
     metadata:
       name: *app
+      annotations:
+        prometheus.io/path: "/__/metrics"
+        prometheus.io/port: "8081"
+        prometheus.io/scrape: "true"
       labels:
         app: *app
         app.kubernetes.io/name: *app
