@@ -25,6 +25,8 @@ spec:
         app.kubernetes.io/component: lag-monitor
         app.kubernetes.io/part-of: kafka
     spec:
+     imagePullSecrets:
+        - name: dockerhub-key
       containers:
         - name: *app
           image: registry.uw.systems/telecom/kafka-lag-monitor:latest
