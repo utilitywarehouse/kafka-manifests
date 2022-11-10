@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app kafka-lag-monitor
+  labels:
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: lag-monitor
+    app.kubernetes.io/part-of: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      name: *app
+      annotations:
+        prometheus.io/path: "/__/metrics"
+        prometheus.io/port: "8081"
+        prometheus.io/scrape: "true"
+      labels:
+        app: *app
+        app.kubernetes.io/name: *app
+        app.kubernetes.io/component: lag-monitor
+        app.kubernetes.io/part-of: kafka
+    spec:
+      containers:
+        - name: *app
+          image: registry.uw.systems/telecom/kafka-lag-monitor:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8081"
+            - name: LOG_LEVEL
+              value: INFO
+            - name: LOG_FORMAT
+              value: text
+            - name: KAFKA_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  key: internal.kafka.broker.version
+                  name: kafka-brokers
+            - name: KAFKA_BROKERS
+              valueFrom:
+                configMapKeyRef:
+                  key: internal.kafka.brokers
+                  name: kafka-brokers
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /__/ready
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /__/ready
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 0
+              memory: 0
+            limits:
+              cpu: 500m
+              memory: 500Mi
