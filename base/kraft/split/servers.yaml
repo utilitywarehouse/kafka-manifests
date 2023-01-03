@@ -49,6 +49,25 @@ spec:
   selector:
     app: *app
 ---
+# Service used by 3rd party tools, e.g. Redpanda Kafka UI
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app kafka
+  labels:
+    app: *app
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/part-of: kafka
+spec:
+  ports:
+    - port: 9092
+      protocol: TCP
+      targetPort: 9092
+  publishNotReadyAddresses: true
+  selector:
+    app: broker
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
