@@ -91,7 +91,16 @@ spec:
           command:
             - sh
             - -ecx
-            - export RAW_CFG=/opt/kafka/config/server.properties CFG=/opt/kafka/config-to-use/server.properties CLUSTER_ID=<some-id> -t2NEvVYd5gA NODE_ID=$(hostname | awk -F'-' '{print $2}') JMX_PORT=9090 && mkdir /opt/kafka/config-to-use && sed "s#node.id=0#node.id=$NODE_ID#" $RAW_CFG > $CFG && if [ ! -f /opt/kafka/data/logs/meta.properties ]; then ./kafka-storage.sh format -t $CLUSTER_ID -c $CFG ; fi && exec ./kafka-server-start.sh $CFG
+            - |
+              export RAW_CFG=/opt/kafka/config/server.properties \
+                     CFG=/opt/kafka/config-to-use/server.properties \
+                     CLUSTER_ID=<some-id> -t2NEvVYd5gA \
+                     NODE_ID=$(hostname | awk -F'-' '{print $2}') \
+                     JMX_PORT=9090 \
+                && mkdir /opt/kafka/config-to-use \
+                && sed "s#node.id=0#node.id=$NODE_ID#" $RAW_CFG > $CFG \
+                && test -f /opt/kafka/data/logs/meta.properties || ./kafka-storage.sh format -t $CLUSTER_ID -c $CFG \
+                && exec ./kafka-server-start.sh $CFG
           env:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx2G -Xms2G
