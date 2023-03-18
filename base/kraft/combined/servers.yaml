@@ -94,7 +94,7 @@ spec:
             - |
               export RAW_CFG=/opt/kafka/config/server.properties \
                      CFG=/opt/kafka/config-to-use/server.properties \
-                     CLUSTER_ID=<some-id> -t2NEvVYd5gA \
+                     CLUSTER_ID=kInMrlv6Tku4rE8mOlah3w \
                      NODE_ID=$(hostname | awk -F'-' '{print $2}') \
                      JMX_PORT=9090 \
                 && mkdir /opt/kafka/config-to-use \
