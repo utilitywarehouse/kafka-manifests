@@ -281,15 +281,16 @@ spec:
               name: kafka-configmap
         - name: jmx-exporter
           image: bitnami/jmx-exporter:0.18.0
-          imagePullPolicy: IfNotPresent
-          command: ["java", "-jar", "jmx_prometheus_httpserver.jar" , "5555", "/app/config/broker.yml"]
+          args: ["5555", "/app/config/broker.yml"]
+          ports:
+            - containerPort: 5555
           resources:
             requests:
-              cpu: 10m
-              memory: 450Mi
+              cpu: 0m
+              memory: 100Mi
             limits:
-              cpu: 1
-              memory: 768Mi
+              cpu: 2
+              memory: 1Gi
           volumeMounts:
             - mountPath: /app/config
               name: jmx-exporter-configmap
