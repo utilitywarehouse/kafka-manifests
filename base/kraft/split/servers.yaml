@@ -88,6 +88,12 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: &app controller
+  annotations:
+    "app.uw.systems/description": "Kafka cluster controller"
+    "app.uw.systems/language": "Java"
+    "app.uw.systems/tier": "tier_1"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/name": "Kafka Controller"
   labels:
     app: *app
     app.kubernetes.io/name: *app
@@ -211,6 +217,12 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: &app broker
+  annotations:
+    "app.uw.systems/description": "Kafka cluster broker"
+    "app.uw.systems/language": "Java"
+    "app.uw.systems/tier": "tier_1"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/name": "Kafka Broker"
   labels:
     app: *app
     app.kubernetes.io/name: *app

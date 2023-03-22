@@ -93,6 +93,12 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: &app kafka
+  annotations:
+    "app.uw.systems/name": "Kafka Broker"
+    "app.uw.systems/description": "Kafka cluster broker"
+    "app.uw.systems/language": "Java"
+    "app.uw.systems/tier": "tier_1"
+    "app.uw.systems/tags.oss": "true"
   labels:
     app: *app
     app.kubernetes.io/name: *app

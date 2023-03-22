@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: &app kafka-lag-monitor
   annotations:
+    "app.uw.systems/repos.kafka-lag-monitor": "https://github.com/utilitywarehouse/kafka-lag-monitor"
+    "app.uw.systems/name": "Kafka lag monitor"
+    "app.uw.systems/description": "Generates metrics in order to power Kafka dashboards and alerts"
+    "app.uw.systems/tier": "tier_4"
     prometheus.io/path: "/__/metrics"
     prometheus.io/port: "8081"
     prometheus.io/scrape: "true"
