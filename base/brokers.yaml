@@ -137,22 +137,17 @@ spec:
             - mountPath: /opt/kafka/config
               name: kafka-configmap
         - name: jmx-exporter
-          image: quay.io/utilitywarehouse/jmx_exporter:0.14.0-1
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: PORT
-              value: "8080"
+          image: bitnami/jmx-exporter:0.18.0
+          args: ["5555", "/app/config/config.yml"]
           ports:
-            - containerPort: 8080
-              name: http
-              protocol: TCP
+            - containerPort: 5555
           resources:
             requests:
-              cpu: 10m
-              memory: 450Mi
+              cpu: 0m
+              memory: 100Mi
             limits:
-              cpu: 1
-              memory: 768Mi
+              cpu: 2
+              memory: 1Gi
           volumeMounts:
             - mountPath: /app/config
               name: jmx-exporter-configmap

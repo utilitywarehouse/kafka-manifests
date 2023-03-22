@@ -178,16 +178,17 @@ spec:
             - mountPath: /opt/kafka/config
               name: kafka-configmap
         - name: controller-jmx-exporter
-          image: quay.io/utilitywarehouse/jmx_exporter:0.14.0-1
-          imagePullPolicy: IfNotPresent
-          command: ["java", "-jar", "jmx_prometheus_httpserver.jar" , "5556", "/app/config/controller.yml"]
+          image: bitnami/jmx-exporter:0.18.0
+          args: ["5556", "/app/config/controller.yml"]
+          ports:
+            - containerPort: 5556
           resources:
             requests:
-              cpu: 10m
-              memory: 450Mi
+              cpu: 0m
+              memory: 100Mi
             limits:
-              cpu: 1
-              memory: 768Mi
+              cpu: 2
+              memory: 1Gi
           volumeMounts:
             - mountPath: /app/config
               name: jmx-exporter-configmap
@@ -237,16 +238,17 @@ spec:
             - mountPath: /opt/kafka/config
               name: kafka-configmap
         - name: broker-jmx-exporter
-          image: quay.io/utilitywarehouse/jmx_exporter:0.14.0-1
-          imagePullPolicy: IfNotPresent
-          command: ["java", "-jar", "jmx_prometheus_httpserver.jar" , "5555", "/app/config/broker.yml"]
+          image: bitnami/jmx-exporter:0.18.0
+          args: ["5555", "/app/config/broker.yml"]
+          ports:
+            - containerPort: 5555
           resources:
             requests:
-              cpu: 10m
-              memory: 450Mi
+              cpu: 0m
+              memory: 100Mi
             limits:
-              cpu: 1
-              memory: 768Mi
+              cpu: 2
+              memory: 1Gi
           volumeMounts:
             - mountPath: /app/config
               name: jmx-exporter-configmap
