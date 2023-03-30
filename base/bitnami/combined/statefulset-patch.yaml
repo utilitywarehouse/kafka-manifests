@@ -1,0 +1,27 @@
+# Add MY_POD_NAMESPACE env var and patch it in places we couldn't get helm
+# render it the way we need it.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  template:
+    spec:
+      containers:
+        - name: kafka
+          env:
+            - name: BITNAMI_DEBUG
+              value: "true"
+            # Even though this is defined in the upstream manifests, do it agin
+            # here to preserve order to KAFKA_CFG_ADVERTISED_LISTENERS, as vars
+            # are replaced on sequential evaluation of the env list.
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "INTERNAL://$(MY_POD_NAME).kafka-headless.$(MY_POD_NAMESPACE).svc.cluster.local:9093,CLIENT://$(MY_POD_NAME).kafka-headless.$(MY_POD_NAMESPACE).svc.cluster.local:9092"
