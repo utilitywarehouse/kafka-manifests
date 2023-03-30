@@ -1,4 +1,4 @@
-fullnameOverride: kafka # Drops version from names
+fullnameOverride: kafka-shared
 replicaCount: 3
 kraft:
   enabled: true

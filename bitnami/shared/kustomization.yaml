@@ -3,6 +3,3 @@ kind: Kustomization
 
 resources:
   - upstream.yaml
-
-patches:
-  - path: statefulset-patch.yaml
