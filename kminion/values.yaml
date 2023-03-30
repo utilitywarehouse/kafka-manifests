@@ -1,0 +1,15 @@
+fullnameOverride: kminion
+service:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+# TODO: This is to generate an example config.yaml in a configMap. It might be
+# a better idea to actually have that configMap defined downstream.
+kminion:
+  config:
+    kafka:
+      brokers:
+        - kafka-shared-0.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093
+        - kafka-shared-1.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093
+        - kafka-shared-2.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093

@@ -1,0 +1,130 @@
+---
+# Source: kminion/templates/poddisruptionbudget.yaml
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: kminion
+  labels:
+    helm.sh/chart: kminion-0.9.0
+    app.kubernetes.io/name: kminion
+    app.kubernetes.io/instance: v2.2.3
+    app.kubernetes.io/version: "v2.2.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kminion
+      app.kubernetes.io/instance: v2.2.3
+---
+# Source: kminion/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kminion
+  labels:
+    helm.sh/chart: kminion-0.9.0
+    app.kubernetes.io/name: kminion
+    app.kubernetes.io/instance: v2.2.3
+    app.kubernetes.io/version: "v2.2.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: kminion/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kminion
+  labels:
+    helm.sh/chart: kminion-0.9.0
+    app.kubernetes.io/name: kminion
+    app.kubernetes.io/instance: v2.2.3
+    app.kubernetes.io/version: "v2.2.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  config.yaml: |
+    kafka:
+      brokers:
+      - kafka-shared-0.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093
+      - kafka-shared-1.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093
+      - kafka-shared-2.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093
+---
+# Source: kminion/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kminion
+  labels:
+    helm.sh/chart: kminion-0.9.0
+    app.kubernetes.io/name: kminion
+    app.kubernetes.io/instance: v2.2.3
+    app.kubernetes.io/version: "v2.2.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scrape: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    app.kubernetes.io/name: kminion
+    app.kubernetes.io/instance: v2.2.3
+---
+# Source: kminion/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kminion
+  labels:
+    helm.sh/chart: kminion-0.9.0
+    app.kubernetes.io/name: kminion
+    app.kubernetes.io/instance: v2.2.3
+    app.kubernetes.io/version: "v2.2.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kminion
+      app.kubernetes.io/instance: v2.2.3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kminion
+        app.kubernetes.io/instance: v2.2.3
+    spec:
+      serviceAccountName: kminion
+      securityContext:
+        fsGroup: 99
+        runAsUser: 99
+      volumes:
+        - name: config
+          configMap:
+            name: kminion
+      containers:
+        - name: kminion
+          securityContext:
+            {}
+          image: "quay.io/cloudhut/kminion:v2.2.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: CONFIG_FILEPATH
+              value: /etc/kminion/config.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /etc/kminion
+          resources:
+            {}
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
