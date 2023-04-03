@@ -28,6 +28,73 @@ metadata:
   annotations:
 automountServiceAccountToken: true
 ---
+# Source: kafka/templates/jmx-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-shared-jmx-configuration
+  namespace: "sys-pubsub"
+  labels:
+    app.kubernetes.io/name: kafka
+    helm.sh/chart: kafka-21.4.4
+    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: metrics
+data:
+  jmx-kafka-prometheus.yml: |-
+    jmxUrl: service:jmx:rmi:///jndi/rmi://127.0.0.1:5555/jmxrmi
+    lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
+    ssl: false
+    whitelistObjectNames: ["kafka.controller:*","kafka.server:*","java.lang:*","kafka.network:*","kafka.log:*"]
+    rules:
+      - pattern: kafka.controller<type=(ControllerChannelManager), name=(QueueSize), broker-id=(\d+)><>(Value)
+        name: kafka_controller_$1_$2_$4
+        labels:
+          broker_id: "$3"
+      - pattern: kafka.controller<type=(ControllerChannelManager), name=(TotalQueueSize)><>(Value)
+        name: kafka_controller_$1_$2_$3
+      - pattern: kafka.controller<type=(KafkaController), name=(.+)><>(Value)
+        name: kafka_controller_$1_$2_$3
+      - pattern: kafka.controller<type=(ControllerStats), name=(.+)><>(Count)
+        name: kafka_controller_$1_$2_$3
+      - pattern : kafka.network<type=(Processor), name=(IdlePercent), networkProcessor=(.+)><>(Value)
+        name: kafka_network_$1_$2_$4
+        labels:
+          network_processor: $3
+      - pattern : kafka.network<type=(RequestMetrics), name=(.+), request=(.+)><>(Count|Value)
+        name: kafka_network_$1_$2_$4
+        labels:
+          request: $3
+      - pattern : kafka.network<type=(SocketServer), name=(.+)><>(Count|Value)
+        name: kafka_network_$1_$2_$3
+      - pattern : kafka.network<type=(RequestChannel), name=(.+)><>(Count|Value)
+        name: kafka_network_$1_$2_$3
+      - pattern: kafka.server<type=(.+), name=(.+), topic=(.+)><>(Count|OneMinuteRate)
+        name: kafka_server_$1_$2_$4
+        labels:
+          topic: $3
+      - pattern: kafka.server<type=(ReplicaFetcherManager), name=(.+), clientId=(.+)><>(Value)
+        name: kafka_server_$1_$2_$4
+        labels:
+          client_id: "$3"
+      - pattern: kafka.server<type=(DelayedOperationPurgatory), name=(.+), delayedOperation=(.+)><>(Value)
+        name: kafka_server_$1_$2_$3_$4
+      - pattern: kafka.server<type=(.+), name=(.+)><>(Count|Value|OneMinuteRate)
+        name: kafka_server_$1_total_$2_$3
+      - pattern: kafka.server<type=(.+)><>(queue-size)
+        name: kafka_server_$1_$2
+      - pattern: java.lang<type=(.+), name=(.+)><(.+)>(\w+)
+        name: java_lang_$1_$4_$3_$2
+      - pattern: java.lang<type=(.+), name=(.+)><>(\w+)
+        name: java_lang_$1_$3_$2
+      - pattern : java.lang<type=(.*)>
+      - pattern: kafka.log<type=(.+), name=(.+), topic=(.+), partition=(.+)><>Value
+        name: kafka_log_$1_$2
+        labels:
+          topic: $3
+          partition: $4
+---
 # Source: kafka/templates/scripts-configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -77,6 +144,36 @@ data:
     # Configure zookeeper client
 
     exec /entrypoint.sh /run.sh
+---
+# Source: kafka/templates/jmx-metrics-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-shared-jmx-metrics
+  namespace: "sys-pubsub"
+  labels:
+    app.kubernetes.io/name: kafka
+    helm.sh/chart: kafka-21.4.4
+    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: metrics
+  annotations:
+    
+    prometheus.io/path: /
+    prometheus.io/port: '5556'
+    prometheus.io/scrape: "true"
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: http-metrics
+      port: 5556
+      protocol: TCP
+      targetPort: metrics
+  selector:
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/kafka-metrics-svc.yaml
 apiVersion: v1
@@ -275,6 +372,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kafka
       annotations:
+        checksum/jmx-configuration: ee179e2450adb5048f72210f7fe289af76001fd3843c3c31bf767b08dbce4f4a
     spec:
       
       hostNetwork: false
@@ -332,6 +430,8 @@ spec:
               value: "yes"
             - name: KAFKA_ZOOKEEPER_PROTOCOL
               value: PLAINTEXT
+            - name: JMX_PORT
+              value: "5555"
             - name: KAFKA_VOLUME_DIR
               value: "/bitnami/kafka"
             - name: KAFKA_LOG_DIR
@@ -430,11 +530,38 @@ spec:
             - name: scripts
               mountPath: /scripts/setup.sh
               subPath: setup.sh
+        - name: jmx-exporter
+          image: docker.io/bitnami/jmx-exporter:0.18.0-debian-11-r5
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          command:
+            - java
+          args:
+            - -XX:MaxRAMPercentage=100
+            - -XshowSettings:vm
+            - -jar
+            - jmx_prometheus_httpserver.jar
+            - "5556"
+            - /etc/jmx-kafka/jmx-kafka-prometheus.yml
+          ports:
+            - name: metrics
+              containerPort: 5556
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: jmx-config
+              mountPath: /etc/jmx-kafka
       volumes:
         - name: scripts
           configMap:
             name: kafka-shared-scripts
             defaultMode: 0755
+        - name: jmx-config
+          configMap:
+            name: kafka-shared-jmx-configuration
         - name: logs
           emptyDir: {}
   volumeClaimTemplates:
