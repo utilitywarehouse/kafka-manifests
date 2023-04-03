@@ -10,3 +10,6 @@ service:
     publishNotReadyAddresses: true
 zookeeper:
   enabled: false
+metrics:
+  kafka:
+    enabled: true
