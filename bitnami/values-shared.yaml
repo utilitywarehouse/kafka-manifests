@@ -15,3 +15,12 @@ metrics:
     enabled: true
   jmx:
     enabled: true
+auth:
+  clientProtocol: mtls
+  interBrokerProtocol: tls
+  tls:
+    type: pem
+    existingSecrets:
+      - kafka-shared-0-tls
+      - kafka-shared-1-tls
+      - kafka-shared-2-tls

@@ -1,0 +1,50 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kafka-selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-shared-0-tls
+spec:
+  issuerRef:
+    kind: Issuer
+    name: kafka-selfsigned-issuer
+  secretName: kafka-shared-0-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-shared-1-tls
+spec:
+  issuerRef:
+    kind: Issuer
+    name: kafka-selfsigned-issuer
+  secretName: kafka-shared-1-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-shared-2-tls
+spec:
+  issuerRef:
+    kind: Issuer
+    name: kafka-selfsigned-issuer
+  secretName: kafka-shared-2-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-exporter
+spec:
+  commonName: kafka-exporter
+  dnsNames:
+    - kafka-exporter.sys-pubsub.svc
+    - kafka-exporter.sys-pubsub.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: kafka-selfsigned-issuer
+  secretName: kafka-exporter-cert
