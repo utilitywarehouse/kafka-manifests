@@ -13,6 +13,10 @@ zookeeper:
 metrics:
   kafka:
     enabled: true
+    certificatesSecret: kafka-exporter-cert
+    tlsCert: tls.crt
+    tlsKey: tls.key
+    tlsCaCert: ca.crt
   jmx:
     enabled: true
 auth:

@@ -357,6 +357,9 @@ spec:
               --kafka.server=kafka-shared-1.kafka-shared-headless.sys-pubsub.svc.cluster.local:9092 \
               --kafka.server=kafka-shared-2.kafka-shared-headless.sys-pubsub.svc.cluster.local:9092 \
               --tls.enabled \
+              --tls.key-file=/opt/bitnami/kafka-exporter/certs/tls.key \
+              --tls.cert-file=/opt/bitnami/kafka-exporter/certs/tls.crt \
+              --tls.ca-file=/opt/bitnami/kafka-exporter/certs/ca.crt \
               --web.listen-address=:9308
           ports:
             - name: metrics
@@ -365,7 +368,14 @@ spec:
             limits: {}
             requests: {}
           volumeMounts:
+            - name: kafka-exporter-certificates
+              mountPath: /opt/bitnami/kafka-exporter/certs/
+              readOnly: true
       volumes:
+        - name: kafka-exporter-certificates
+          secret:
+            secretName: kafka-exporter-cert
+            defaultMode: 0440
 ---
 # Source: kafka/templates/statefulset.yaml
 apiVersion: apps/v1
