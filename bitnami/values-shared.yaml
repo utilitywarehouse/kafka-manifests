@@ -19,13 +19,14 @@ metrics:
     tlsCaCert: ca.crt
   jmx:
     enabled: true
-allowEveryoneIfNoAclFound: true
+allowEveryoneIfNoAclFound: false
+authorizerClassName: org.apache.kafka.metadata.authorizer.StandardAuthorizer
 auth:
   clientProtocol: mtls
   interBrokerProtocol: tls
+  controllerProtocol: tls
   tls:
     type: pem
-    endpointIdentificationAlgorithm: ""
     existingSecrets:
       - kafka-shared-0-tls
       - kafka-shared-1-tls
