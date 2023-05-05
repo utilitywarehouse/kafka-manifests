@@ -12,7 +12,7 @@ metadata:
 spec:
   issuerRef:
     kind: Issuer
-    name: kafka-selfsigned-issuer
+    name: kafka-selfsigned-ca-issuer
   secretName: kafka-selfsigned-ca
   commonName: kafka-shared
   isCA: true
