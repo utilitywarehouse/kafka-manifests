@@ -493,7 +493,7 @@ spec:
             - name: KAFKA_CFG_SUPER_USERS
               value: "User:admin"
             - name: KAFKA_KRAFT_CLUSTER_ID
-              value: "OTE4MjEwYTgzMmMxNDE3ZT"  
+              value: "k6fA260ZKAhRUMBN7aMApm"  
             - name: KAFKA_CFG_PROCESS_ROLES
               value: "broker,controller"  
             - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
