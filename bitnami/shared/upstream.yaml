@@ -531,6 +531,9 @@ spec:
               mountPath: /bitnami/kafka
             - name: logs
               mountPath: /opt/bitnami/kafka/logs
+            - name: log4j-config
+              mountPath: /bitnami/kafka/config/log4j.properties
+              subPath: log4j.properties
             - name: scripts
               mountPath: /scripts/setup.sh
               subPath: setup.sh
@@ -559,6 +562,10 @@ spec:
             - name: jmx-config
               mountPath: /etc/jmx-kafka
       volumes:
+        - name: log4j-config
+          configMap:
+            name: kafka-log4j-config
+        
         - name: scripts
           configMap:
             name: kafka-shared-scripts

@@ -3,3 +3,9 @@ kind: Kustomization
 
 resources:
   - upstream.yaml
+configMapGenerator:
+  - name: kafka-log4j-config
+    files:
+      - log4j.properties=log4j.properties
+    options:
+      disableNameSuffixHash: true
