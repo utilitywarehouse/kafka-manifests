@@ -1,4 +1,5 @@
 fullnameOverride: kafka-shared
+nameOverride: kafka-shared
 replicaCount: 3
 kraft:
   enabled: true

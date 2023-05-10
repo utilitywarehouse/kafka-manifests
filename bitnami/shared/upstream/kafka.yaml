@@ -6,7 +6,7 @@ metadata:
   name: kafka-shared-exporter
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -20,7 +20,7 @@ metadata:
   name: kafka-shared
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -35,7 +35,7 @@ metadata:
   name: kafka-shared-jmx-configuration
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -102,7 +102,7 @@ metadata:
   name: kafka-shared-scripts
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -156,7 +156,7 @@ metadata:
   name: kafka-shared-jmx-metrics
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -175,7 +175,7 @@ spec:
       protocol: TCP
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: kafka
 ---
@@ -186,7 +186,7 @@ metadata:
   name: kafka-shared-metrics
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -205,7 +205,7 @@ spec:
       protocol: TCP
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: cluster-metrics
 ---
@@ -216,7 +216,7 @@ metadata:
   name: kafka-shared-headless
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -239,7 +239,7 @@ spec:
       port: 9093
       targetPort: kafka-ctlr
   selector:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: kafka
 ---
@@ -250,7 +250,7 @@ metadata:
   name: kafka-shared
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -265,7 +265,7 @@ spec:
       targetPort: kafka-client
       nodePort: null
   selector:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: kafka
 ---
@@ -276,7 +276,7 @@ metadata:
   name: kafka-shared-exporter
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -285,13 +285,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka
+      app.kubernetes.io/name: kafka-shared
       app.kubernetes.io/instance: 22.0.0
       app.kubernetes.io/component: cluster-metrics
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka
+        app.kubernetes.io/name: kafka-shared
         helm.sh/chart: kafka-22.0.3
         app.kubernetes.io/instance: 22.0.0
         app.kubernetes.io/managed-by: Helm
@@ -307,7 +307,7 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: kafka
+                    app.kubernetes.io/name: kafka-shared
                     app.kubernetes.io/instance: 22.0.0
                     app.kubernetes.io/component: metrics
                 topologyKey: kubernetes.io/hostname
@@ -350,7 +350,7 @@ metadata:
   name: kafka-shared
   namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
@@ -360,7 +360,7 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka
+      app.kubernetes.io/name: kafka-shared
       app.kubernetes.io/instance: 22.0.0
       app.kubernetes.io/component: kafka
   serviceName: kafka-shared-headless
@@ -370,13 +370,13 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka
+        app.kubernetes.io/name: kafka-shared
         helm.sh/chart: kafka-22.0.3
         app.kubernetes.io/instance: 22.0.0
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kafka
       annotations:
-        checksum/jmx-configuration: ec38320eef4154ff3dcbbaad21694393d358700c5ea8359e45e4efa4893c77fe
+        checksum/jmx-configuration: e5e2cd8c61712cabb61197754b96e8974f0f18b61446094975c96a2003e88fd8
     spec:
       
       hostNetwork: false
@@ -389,7 +389,7 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: kafka
+                    app.kubernetes.io/name: kafka-shared
                     app.kubernetes.io/instance: 22.0.0
                     app.kubernetes.io/component: kafka
                 topologyKey: kubernetes.io/hostname
