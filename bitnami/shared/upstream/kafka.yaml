@@ -7,7 +7,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
@@ -21,7 +21,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
@@ -36,7 +36,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
@@ -103,7 +103,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
 data:
@@ -157,7 +157,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
@@ -187,7 +187,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
@@ -217,7 +217,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
@@ -251,7 +251,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
@@ -277,7 +277,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
@@ -292,7 +292,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: kafka
-        helm.sh/chart: kafka-22.0.2
+        helm.sh/chart: kafka-22.0.3
         app.kubernetes.io/instance: 22.0.0
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: cluster-metrics
@@ -319,7 +319,7 @@ spec:
       serviceAccountName: kafka-shared-exporter
       containers:
         - name: kafka-exporter
-          image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r80
+          image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r86
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsNonRoot: true
@@ -351,7 +351,7 @@ metadata:
   namespace: "pubsub"
   labels:
     app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
+    helm.sh/chart: kafka-22.0.3
     app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
@@ -371,12 +371,12 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: kafka
-        helm.sh/chart: kafka-22.0.2
+        helm.sh/chart: kafka-22.0.3
         app.kubernetes.io/instance: 22.0.0
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kafka
       annotations:
-        checksum/jmx-configuration: a7f19d54f2641ab4fe042183a40091dc751a18eff790c60214d431f5a241f542
+        checksum/jmx-configuration: ec38320eef4154ff3dcbbaad21694393d358700c5ea8359e45e4efa4893c77fe
     spec:
       
       hostNetwork: false
@@ -401,7 +401,7 @@ spec:
       serviceAccountName: kafka-shared
       containers:
         - name: kafka
-          image: docker.io/bitnami/kafka:3.4.0-debian-11-r22
+          image: docker.io/bitnami/kafka:3.4.0-debian-11-r28
           imagePullPolicy: "IfNotPresent"
           securityContext:
             allowPrivilegeEscalation: false
@@ -538,7 +538,7 @@ spec:
               mountPath: /scripts/setup.sh
               subPath: setup.sh
         - name: jmx-exporter
-          image: docker.io/bitnami/jmx-exporter:0.18.0-debian-11-r12
+          image: docker.io/bitnami/jmx-exporter:0.18.0-debian-11-r18
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsNonRoot: true
