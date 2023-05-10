@@ -38,3 +38,14 @@ patches:
     target:
       group: apps
       version: v1 # Deployment | StatefulSet
+  # remove these empty affinity nodes, as in Kustomize 5.0.x kustomize generates them as strings with value "null" instead of just null, and they can not be applied.
+  # should recheck these on future kustomize versions.
+  - patch: |-
+      - op: remove
+        path: /spec/template/spec/affinity/podAffinity
+      - op: remove
+        path: /spec/template/spec/affinity/nodeAffinity
+    target:
+      group: apps
+      version: v1 # Deployment | StatefulSet
+      kind: StatefulSet
