@@ -1,10 +1,12 @@
 fullnameOverride: kafka-shared
+nameOverride: kafka-shared
 replicaCount: 3
 kraft:
   enabled: true
   processRoles: broker,controller
   controllerListenerNames: CONTROLLER
-  clusterId: OTE4MjEwYTgzMmMxNDE3ZT # cat /proc/sys/kernel/random/uuid | tr -d '-' | base64 | cut -b 1-22
+  clusterId: k6fA260ZKAhRUMBN7aMApm # cat /proc/sys/kernel/random/uuid | tr -d '-' | base64 | cut -b 1-22
+existingLog4jConfigMap: kafka-log4j-config
 service:
   headless:
     publishNotReadyAddresses: true

@@ -4,11 +4,11 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kafka-shared-exporter
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
 automountServiceAccountToken: true
@@ -18,11 +18,11 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kafka-shared
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
   annotations:
@@ -33,11 +33,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kafka-shared-jmx-configuration
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
 data:
@@ -100,11 +100,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kafka-shared-scripts
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
 data:
   setup.sh: |-
@@ -133,7 +133,7 @@ data:
         pod_id=0
         while :
         do 
-            VOTERS="${VOTERS}$node_id@kafka-shared-$pod_id.kafka-shared-headless.sys-pubsub.svc.cluster.local:9093"
+            VOTERS="${VOTERS}$node_id@kafka-shared-$pod_id.kafka-shared-headless.pubsub.svc.cluster.local:9093"
             node_id=$(( $node_id + 1 ))
             pod_id=$(( $pod_id + 1 ))
             if [[ $pod_id -ge 3 ]]; then
@@ -177,11 +177,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka-shared-jmx-metrics
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
   annotations:
@@ -198,8 +198,8 @@ spec:
       protocol: TCP
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/kafka-metrics-svc.yaml
@@ -207,11 +207,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka-shared-metrics
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
   annotations:
@@ -228,8 +228,8 @@ spec:
       protocol: TCP
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: cluster-metrics
 ---
 # Source: kafka/templates/svc-headless.yaml
@@ -237,11 +237,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka-shared-headless
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
 spec:
@@ -262,8 +262,8 @@ spec:
       port: 9093
       targetPort: kafka-ctlr
   selector:
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/svc.yaml
@@ -271,11 +271,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka-shared
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
 spec:
@@ -288,8 +288,8 @@ spec:
       targetPort: kafka-client
       nodePort: null
   selector:
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/kafka-metrics-deployment.yaml
@@ -297,26 +297,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka-shared-exporter
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka
-      app.kubernetes.io/instance: 21.4.2
+      app.kubernetes.io/name: kafka-shared
+      app.kubernetes.io/instance: 22.0.0
       app.kubernetes.io/component: cluster-metrics
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka
-        helm.sh/chart: kafka-22.0.2
-        app.kubernetes.io/instance: 21.4.2
+        app.kubernetes.io/name: kafka-shared
+        helm.sh/chart: kafka-22.1.1
+        app.kubernetes.io/instance: 22.0.0
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: cluster-metrics
       annotations:
@@ -330,8 +330,8 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: kafka
-                    app.kubernetes.io/instance: 21.4.2
+                    app.kubernetes.io/name: kafka-shared
+                    app.kubernetes.io/instance: 22.0.0
                     app.kubernetes.io/component: metrics
                 topologyKey: kubernetes.io/hostname
               weight: 1
@@ -342,7 +342,7 @@ spec:
       serviceAccountName: kafka-shared-exporter
       containers:
         - name: kafka-exporter
-          image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r80
+          image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r86
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsNonRoot: true
@@ -353,9 +353,9 @@ spec:
             - -ce
             - |
               kafka_exporter \
-              --kafka.server=kafka-shared-0.kafka-shared-headless.sys-pubsub.svc.cluster.local:9092 \
-              --kafka.server=kafka-shared-1.kafka-shared-headless.sys-pubsub.svc.cluster.local:9092 \
-              --kafka.server=kafka-shared-2.kafka-shared-headless.sys-pubsub.svc.cluster.local:9092 \
+              --kafka.server=kafka-shared-0.kafka-shared-headless.pubsub.svc.cluster.local:9092 \
+              --kafka.server=kafka-shared-1.kafka-shared-headless.pubsub.svc.cluster.local:9092 \
+              --kafka.server=kafka-shared-2.kafka-shared-headless.pubsub.svc.cluster.local:9092 \
               --tls.enabled \
               --tls.key-file=/opt/bitnami/kafka-exporter/certs/tls.key \
               --tls.cert-file=/opt/bitnami/kafka-exporter/certs/tls.crt \
@@ -382,11 +382,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka-shared
-  namespace: "sys-pubsub"
+  namespace: "pubsub"
   labels:
-    app.kubernetes.io/name: kafka
-    helm.sh/chart: kafka-22.0.2
-    app.kubernetes.io/instance: 21.4.2
+    app.kubernetes.io/name: kafka-shared
+    helm.sh/chart: kafka-22.1.1
+    app.kubernetes.io/instance: 22.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
 spec:
@@ -394,8 +394,8 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka
-      app.kubernetes.io/instance: 21.4.2
+      app.kubernetes.io/name: kafka-shared
+      app.kubernetes.io/instance: 22.0.0
       app.kubernetes.io/component: kafka
   serviceName: kafka-shared-headless
   updateStrategy:
@@ -404,13 +404,13 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka
-        helm.sh/chart: kafka-22.0.2
-        app.kubernetes.io/instance: 21.4.2
+        app.kubernetes.io/name: kafka-shared
+        helm.sh/chart: kafka-22.1.1
+        app.kubernetes.io/instance: 22.0.0
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kafka
       annotations:
-        checksum/jmx-configuration: 9ab89b3384c94bf73a406c68fe88cbd809b3daed3f9063f6c64a6bfe42dc7cfb
+        checksum/jmx-configuration: 550ac38e32ea016567c2ad3960ac1fb954521f7105553275a704a44b11e7d911
     spec:
       
       hostNetwork: false
@@ -423,8 +423,8 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: kafka
-                    app.kubernetes.io/instance: 21.4.2
+                    app.kubernetes.io/name: kafka-shared
+                    app.kubernetes.io/instance: 22.0.0
                     app.kubernetes.io/component: kafka
                 topologyKey: kubernetes.io/hostname
               weight: 1
@@ -435,7 +435,7 @@ spec:
       serviceAccountName: kafka-shared
       containers:
         - name: kafka
-          image: docker.io/bitnami/kafka:3.4.0-debian-11-r22
+          image: docker.io/bitnami/kafka:3.4.0-debian-11-r28
           imagePullPolicy: "IfNotPresent"
           securityContext:
             allowPrivilegeEscalation: false
@@ -463,7 +463,7 @@ spec:
             - name: KAFKA_CFG_LISTENERS
               value: "INTERNAL://:9094,CLIENT://:9092,CONTROLLER://:9093"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: "INTERNAL://$(MY_POD_NAME).kafka-shared-headless.sys-pubsub.svc.cluster.local:9094,CLIENT://$(MY_POD_NAME).kafka-shared-headless.sys-pubsub.svc.cluster.local:9092"
+              value: "INTERNAL://$(MY_POD_NAME).kafka-shared-headless.pubsub.svc.cluster.local:9094,CLIENT://$(MY_POD_NAME).kafka-shared-headless.pubsub.svc.cluster.local:9092"
             - name: ALLOW_PLAINTEXT_LISTENER
               value: "yes"
             - name: KAFKA_ZOOKEEPER_PROTOCOL
@@ -535,7 +535,7 @@ spec:
             - name: KAFKA_CFG_SUPER_USERS
               value: "User:admin"
             - name: KAFKA_KRAFT_CLUSTER_ID
-              value: "OTE4MjEwYTgzMmMxNDE3ZT"  
+              value: "k6fA260ZKAhRUMBN7aMApm"  
             - name: KAFKA_CFG_PROCESS_ROLES
               value: "broker,controller"  
             - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
@@ -573,6 +573,9 @@ spec:
               mountPath: /bitnami/kafka
             - name: logs
               mountPath: /opt/bitnami/kafka/logs
+            - name: log4j-config
+              mountPath: /bitnami/kafka/config/log4j.properties
+              subPath: log4j.properties
             - name: scripts
               mountPath: /scripts/setup.sh
               subPath: setup.sh
@@ -586,7 +589,7 @@ spec:
               mountPath: /certs-2
               readOnly: true
         - name: jmx-exporter
-          image: docker.io/bitnami/jmx-exporter:0.18.0-debian-11-r12
+          image: docker.io/bitnami/jmx-exporter:0.18.0-debian-11-r18
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsNonRoot: true
@@ -610,6 +613,10 @@ spec:
             - name: jmx-config
               mountPath: /etc/jmx-kafka
       volumes:
+        - name: log4j-config
+          configMap:
+            name: kafka-log4j-config
+        
         - name: scripts
           configMap:
             name: kafka-shared-scripts

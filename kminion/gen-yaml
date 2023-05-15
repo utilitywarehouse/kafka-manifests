@@ -1,8 +1,0 @@
-#!/bin/sh
-
-mkdir -p base
-
-# https://github.com/redpanda-data/kminion/tree/master/charts#installing-the-helm-chart
-helm repo add kminion https://raw.githubusercontent.com/cloudhut/kminion/master/charts/archives
-helm repo update
-helm template ${KMINION_RELEASE} kminion/kminion -f values.yaml | sed '/namespace:.*/d' > base/upstream.yaml
