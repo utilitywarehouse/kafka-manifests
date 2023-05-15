@@ -1,39 +1,17 @@
 apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: kafka-selfsigned-ca-issuer
-spec:
-  selfSigned: {}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: kafka-selfsigned-ca
-spec:
-  issuerRef:
-    kind: Issuer
-    name: kafka-selfsigned-ca-issuer
-  secretName: kafka-selfsigned-ca
-  commonName: kafka-shared
-  isCA: true
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: kafka-selfsigned-issuer
-spec:
-  ca:
-    secretName: kafka-selfsigned-ca
----
-apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: kafka-shared-0-tls
 spec:
   issuerRef:
-    kind: Issuer
-    name: kafka-selfsigned-issuer
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
   secretName: kafka-shared-0-tls
+  commonName: pubsub/kafka-shared-0.kafka-shared-headless
+  dnsNames:
+    - kafka-shared-0.kafka-shared-headless.pubsub
+    - kafka-shared-0.kafka-shared-headless.pubsub.svc
+    - kafka-shared-0.kafka-shared-headless.pubsub.svc.cluster.local
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -41,9 +19,14 @@ metadata:
   name: kafka-shared-1-tls
 spec:
   issuerRef:
-    kind: Issuer
-    name: kafka-selfsigned-issuer
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
   secretName: kafka-shared-1-tls
+  commonName: pubsub/kafka-shared-1.kafka-shared-headless
+  dnsNames:
+    - kafka-shared-1.kafka-shared-headless.pubsub
+    - kafka-shared-1.kafka-shared-headless.pubsub.svc
+    - kafka-shared-1.kafka-shared-headless.pubsub.svc.cluster.local
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -51,20 +34,25 @@ metadata:
   name: kafka-shared-2-tls
 spec:
   issuerRef:
-    kind: Issuer
-    name: kafka-selfsigned-issuer
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
   secretName: kafka-shared-2-tls
+  commonName: pubsub/kafka-shared-2.kafka-shared-headless
+  dnsNames:
+    - kafka-shared-2.kafka-shared-headless.pubsub
+    - kafka-shared-2.kafka-shared-headless.pubsub.svc
+    - kafka-shared-2.kafka-shared-headless.pubsub.svc.cluster.local
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: kafka-exporter
 spec:
-  commonName: kafka-exporter
+  commonName: pubsub/kafka-exporter
   dnsNames:
-    - kafka-exporter.sys-pubsub.svc
-    - kafka-exporter.sys-pubsub.svc.cluster.local
+    - kafka-exporter.pubsub.svc
+    - kafka-exporter.pubsub.svc.cluster.local
   issuerRef:
-    kind: Issuer
-    name: kafka-selfsigned-issuer
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
   secretName: kafka-exporter-cert
