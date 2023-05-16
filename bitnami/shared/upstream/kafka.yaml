@@ -471,7 +471,7 @@ spec:
             - name: KAFKA_TLS_TYPE
               value: "PEM"
             - name: KAFKA_CFG_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
-              value: "https"
+              value: ""
             - name: KAFKA_TLS_CLIENT_AUTH
               value: "required"
             - name: KAFKA_CERTIFICATE_PASSWORD
