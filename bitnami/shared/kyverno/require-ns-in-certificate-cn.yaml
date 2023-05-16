@@ -1,0 +1,30 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-cn-to-start-with-namespace
+  annotations:
+    policies.kyverno.io/title: Require Namespace IN Certificate CN
+    policies.kyverno.io/category: cert-manager
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Certificate
+    policies.kyverno.io/description: >-
+      certificates requests should prefix CN with the origin namespace
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-certificate-cn-prefix
+      match:
+        resources:
+          kinds:
+            - Certificate
+      preconditions:
+        any:
+          - key: "{{ request.object.spec.issuerRef.name || '' }}"
+            operator: Equals
+            value: kafka-shared-selfsigned-issuer
+      validate:
+        message: "CN must be prefixed with the namespace"
+        pattern:
+          spec:
+            commonName: "{{ request.namespace }}/*"

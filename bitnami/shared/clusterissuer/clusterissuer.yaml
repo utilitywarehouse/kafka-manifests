@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kafka-shared-selfsigned-ca-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-shared-selfsigned-ca
+spec:
+  issuerRef:
+    kind: Issuer
+    name: kafka-shared-selfsigned-ca-issuer
+  secretName: kafka-shared-selfsigned-ca
+  commonName: kafka-shared
+  isCA: true
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: kafka-shared-selfsigned-issuer
+spec:
+  ca:
+    secretName: kafka-shared-selfsigned-ca
