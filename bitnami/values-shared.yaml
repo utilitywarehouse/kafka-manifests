@@ -29,6 +29,7 @@ auth:
   controllerProtocol: tls
   tls:
     type: pem
+    endpointIdentificationAlgorithm: "" # Default is https and will mean that it will try verify clients address in the passed cert
     existingSecrets:
       - kafka-shared-0-tls
       - kafka-shared-1-tls

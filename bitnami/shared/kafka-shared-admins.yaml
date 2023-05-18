@@ -10,4 +10,4 @@ spec:
         - name: kafka
           env:
             - name: KAFKA_CFG_SUPER_USERS
-              value: "User:CN=pubsub/kafka-shared-0.kafka-shared-headless;User:CN=pubsub/kafka-shared-1.kafka-shared-headless;User:CN=pubsub/kafka-shared-2.kafka-shared-headless"
+              value: "User:CN=pubsub/kafka-shared-0.kafka-shared-headless;User:CN=pubsub/kafka-shared-1.kafka-shared-headless;User:CN=pubsub/kafka-shared-2.kafka-shared-headless;User:CN=pubsub/kafka-shared-tf-applier"
