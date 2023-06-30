@@ -157,7 +157,7 @@ spec:
           env:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx2G -Xms2G
-          image: quay.io/utilitywarehouse/uw-kafka:v3.3.1
+          image: quay.io/utilitywarehouse/uw-kafka:v3.5.0
           imagePullPolicy: IfNotPresent
           readinessProbe:
             tcpSocket:
@@ -215,7 +215,7 @@ spec:
           env:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx2G -Xms2G
-          image: quay.io/utilitywarehouse/uw-kafka:v3.3.1
+          image: quay.io/utilitywarehouse/uw-kafka:v3.5.0
           imagePullPolicy: IfNotPresent
           readinessProbe:
             failureThreshold: 10
