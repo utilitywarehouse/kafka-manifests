@@ -1,0 +1,12 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+# This configmap should be enabled in the concrete usages of this base
+#configMapGenerator:
+#  - name: mm2-cfg
+#    files:
+#      - connect-mirror-maker.properties=config/connect-mirror-maker-sample.properties
