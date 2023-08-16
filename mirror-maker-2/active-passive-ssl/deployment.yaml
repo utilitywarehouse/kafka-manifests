@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app mm2
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+        policy.semaphore.uw.io/name: "mirror-maker-2"
+    spec:
+      terminationGracePeriodSeconds: 300
+      initContainers:
+        # populate config from environment variables
+        - name: render-config
+          image: alpine
+          args:
+            - /bin/sh
+            - -c
+            # use gomplate for rendering the go template
+            - |
+              apk add --no-cache gomplate;
+              gomplate -f /config-template/connect-mirror-maker-template.properties -o ./config/connect-mirror-maker.properties
+
+          env:
+            - name: SOURCE_NAME
+              value: source
+            - name: SOURCE_BOOTSTRAP_SERVERS
+              value: source:9092
+            - name: TARGET_NAME
+              value: target
+            - name: TARGET_BOOTSTRAP_SERVERS
+              value: target:9092
+            - name: TOPICS
+              value: ".*"
+            - name: GROUPS
+              value: ".*"
+            # if set to true, the source name will be added as a prefix to the replicated topics in the target cluster.
+            # Example: with source name set to 'otel', when replicating topic otlp_spans, the topic name in the target will be 'otel.otlp_spans'
+            - name: TARGET_TOPICS_ADD_CLUSTER_PREFIX
+              value: "false"
+            - name: SYNC_TOPIC_CONFIGS
+              value: "true"
+            - name: SYNC_TOPIC_ACLS
+              value: "false"
+            # When source has SSL enabled, mirror maker uses JKS keystore and truststore encrypted by password to connect. Use properties below
+            - name: SOURCE_SSL_ENABLE
+              value: "false"
+            # The location to the JKS truststore
+            - name: SOURCE_TRUSTSTORE
+            - name: SOURCE_TRUSTSTORE_PASSWORD
+            # The location to the JKS keystore
+            - name: SOURCE_KEYSTORE
+            - name: SOURCE_KEYSTORE_PASSWORD
+
+            # When target has SSL enabled, mirror maker uses JKS keystore and truststore encrypted by password to connect. Use properties below
+            - name: TARGET_SSL_ENABLE
+              value: "false"
+            # The location to the JKS truststore
+            - name: TARGET_TRUSTSTORE
+            - name: TARGET_TRUSTSTORE_PASSWORD
+            # The location to the JKS keystore
+            - name: TARGET_KEYSTORE
+            - name: TARGET_KEYSTORE_PASSWORD
+
+      containers:
+        - name: *app
+          imagePullPolicy: IfNotPresent
+          image: bitnami/kafka:3.4
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx4G -Xms4G
+          command:
+            #  the config is mounted from file generated from a template in the init container
+            - sh
+            - -ecx
+            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh /config/connect-mirror-maker.properties
+          resources:
+            requests:
+              cpu: 400m
+              memory: 400Mi
+            limits:
+              cpu: "2"
+              memory: 8000Mi
+          volumeMounts:
+            - name: mm2-cfg
+              mountPath: /config
+            - name: mm2-cfg-template
+              mountPath: /config-template
+      volumes:
+        - name: mm2-cfg-template
+          configMap:
+            name: mm2-cfg-template
+        - name: mm2-cfg
+          emptyDir: {}
+
