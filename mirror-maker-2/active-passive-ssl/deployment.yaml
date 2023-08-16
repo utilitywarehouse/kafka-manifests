@@ -68,7 +68,11 @@ spec:
             # The location to the JKS keystore
             - name: TARGET_KEYSTORE
             - name: TARGET_KEYSTORE_PASSWORD
-
+          volumeMounts:
+            - name: mm2-cfg
+              mountPath: /config
+            - name: mm2-cfg-template
+              mountPath: /config-template
       containers:
         - name: *app
           imagePullPolicy: IfNotPresent
@@ -91,8 +95,6 @@ spec:
           volumeMounts:
             - name: mm2-cfg
               mountPath: /config
-            - name: mm2-cfg-template
-              mountPath: /config-template
       volumes:
         - name: mm2-cfg-template
           configMap:
