@@ -15,7 +15,7 @@ spec:
         app: *app
         policy.semaphore.uw.io/name: "mirror-maker-2"
     spec:
-      terminationGracePeriodSeconds: 300
+      terminationGracePeriodSeconds: 30
       containers:
         - name: *app
           imagePullPolicy: IfNotPresent
@@ -28,6 +28,11 @@ spec:
             - sh
             - -ecx
             - /opt/bitnami/kafka/bin/connect-mirror-maker.sh /config/connect-mirror-maker.properties
+          lifecycle:
+            # stop the java process with a prestop hook, otherwise the TERM signal doesn't get to the process, since it is spawned by the connect-mirror-maker.sh
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "kill $(ps -ef | grep java | grep -v grep | awk '{print $2}')"]
           resources:
             requests:
               cpu: 400m
