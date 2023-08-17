@@ -79,7 +79,7 @@ spec:
           image: bitnami/kafka:3.4
           env:
             - name: KAFKA_HEAP_OPTS
-              value: -Xmx4G -Xms4G
+              value: -Xmx4G -Xms1G
           command:
             #  the config is mounted from file generated from a template in the init container
             - sh
@@ -93,10 +93,10 @@ spec:
           resources:
             requests:
               cpu: 400m
-              memory: 400Mi
+              memory: 1Gi
             limits:
               cpu: "2"
-              memory: 8000Mi
+              memory: 5Gi
           volumeMounts:
             - name: mm2-cfg
               mountPath: /config
