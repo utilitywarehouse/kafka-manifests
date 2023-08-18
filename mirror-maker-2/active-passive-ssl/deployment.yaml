@@ -100,7 +100,7 @@ spec:
               mountPath: /log4j-config
         - name: jmx-exporter
           image: bitnami/jmx-exporter:0.19.0
-          args: ["5555", "/jmx-exporter-config/config.yml"]
+          args: ["5555", "/jmx-exporter-config/config.yaml"]
           ports:
             - containerPort: 5555
           resources:
