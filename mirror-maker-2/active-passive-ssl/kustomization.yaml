@@ -9,3 +9,6 @@ configMapGenerator:
   - name: mm2-cfg-template
     files:
       - connect-mirror-maker-template.properties=config/connect-mirror-maker-template.properties
+  - name: mm2-log4j-config
+    files:
+      - connect-log4j.properties=config/connect-log4j.properties

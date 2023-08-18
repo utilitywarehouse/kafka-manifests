@@ -80,6 +80,8 @@ spec:
           env:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx4G -Xms1G
+            - name: KAFKA_LOG4J_OPTS
+              value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
           command:
             #  the config is mounted from file generated from a template in the init container
             - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
@@ -94,10 +96,15 @@ spec:
           volumeMounts:
             - name: mm2-cfg
               mountPath: /config
+            - name: log4j-config
+              mountPath: /log4j-config
       volumes:
         - name: mm2-cfg-template
           configMap:
             name: mm2-cfg-template
         - name: mm2-cfg
           emptyDir: {}
+        - name: log4j-config
+          configMap:
+            name: mm2-log4j-config
 
