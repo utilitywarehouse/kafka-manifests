@@ -24,15 +24,8 @@ spec:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx4G -Xms500M
           command:
-            #  the config is mounted from a config map created in kustomization.yaml
-            - sh
-            - -ecx
-            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh /config/connect-mirror-maker.properties
-          lifecycle:
-            # stop the java process with a prestop hook, otherwise the TERM signal doesn't get to the process, since it is spawned by the connect-mirror-maker.sh
-            preStop:
-              exec:
-                command: ["/bin/sh", "-c", "kill $(ps -ef | grep java | grep -v grep | awk '{print $2}')"]
+            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
+            - /config/connect-mirror-maker.properties
           resources:
             requests:
               cpu: 400m

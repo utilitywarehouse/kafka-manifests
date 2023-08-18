@@ -82,14 +82,8 @@ spec:
               value: -Xmx4G -Xms1G
           command:
             #  the config is mounted from file generated from a template in the init container
-            - sh
-            - -ecx
-            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh /config/connect-mirror-maker.properties
-          lifecycle:
-            # stop the java process with a prestop hook, otherwise the TERM signal doesn't get to the process, since it is spawned by the connect-mirror-maker.sh
-            preStop:
-              exec:
-                command: ["/bin/sh", "-c", "kill $(ps -ef | grep java | grep -v grep | awk '{print $2}')"]
+            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
+            - /config/connect-mirror-maker.properties
           resources:
             requests:
               cpu: 400m
