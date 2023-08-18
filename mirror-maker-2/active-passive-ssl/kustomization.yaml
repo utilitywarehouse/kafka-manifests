@@ -12,3 +12,6 @@ configMapGenerator:
   - name: mm2-log4j-config
     files:
       - connect-log4j.properties=config/connect-log4j.properties
+  - name: jmx-exporter-config
+    files:
+      - config.yaml=config/jmx-exporter-config.yaml
