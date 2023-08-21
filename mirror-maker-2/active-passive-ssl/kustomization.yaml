@@ -6,12 +6,12 @@ resources:
   - deployment.yaml
 
 configMapGenerator:
-  - name: mm2-cfg-template
+  - name: mm2-config-template
     files:
       - connect-mirror-maker-template.properties=config/connect-mirror-maker-template.properties
   - name: mm2-log4j-config
     files:
       - connect-log4j.properties=config/connect-log4j.properties
-  - name: jmx-exporter-config
+  - name: mm2-jmx-exporter-config
     files:
       - config.yaml=config/jmx-exporter-config.yaml

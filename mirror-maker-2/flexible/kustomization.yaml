@@ -10,6 +10,6 @@ configMapGenerator:
     files:
       - connect-log4j.properties=config/connect-log4j.properties
 # This configmap should be enabled in the concrete usages of this base
-#  - name: mm2-cfg
+#  - name: mm2-config
 #    files:
 #      - connect-mirror-maker.properties=config/connect-mirror-maker-sample.properties

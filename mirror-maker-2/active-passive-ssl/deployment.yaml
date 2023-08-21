@@ -73,9 +73,9 @@ spec:
             - name: TARGET_KEYSTORE
             - name: TARGET_KEYSTORE_PASSWORD
           volumeMounts:
-            - name: mm2-cfg
+            - name: mm2-config
               mountPath: /config
-            - name: mm2-cfg-template
+            - name: mm2-config-template
               mountPath: /config-template
       containers:
         - name: *app
@@ -100,7 +100,7 @@ spec:
               cpu: "2"
               memory: 5Gi
           volumeMounts:
-            - name: mm2-cfg
+            - name: mm2-config
               mountPath: /config
             - name: log4j-config
               mountPath: /log4j-config
@@ -120,10 +120,10 @@ spec:
             - mountPath: /jmx-exporter-config
               name: jmx-exporter-config
       volumes:
-        - name: mm2-cfg-template
+        - name: mm2-config-template
           configMap:
-            name: mm2-cfg-template
-        - name: mm2-cfg
+            name: mm2-config-template
+        - name: mm2-config
           emptyDir: {}
         - name: log4j-config
           configMap:
@@ -131,5 +131,5 @@ spec:
         - name: jmx-exporter-config
           configMap:
             defaultMode: 420
-            name: jmx-exporter-config
+            name: mm2-jmx-exporter-config
 
