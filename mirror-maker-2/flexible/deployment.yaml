@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app mm2
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+        policy.semaphore.uw.io/name: "mirror-maker-2"
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: *app
+          imagePullPolicy: IfNotPresent
+          image: bitnami/kafka:3.4
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx4G -Xms500M
+            - name: KAFKA_LOG4J_OPTS
+              value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
+          command:
+            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
+            - /config/connect-mirror-maker.properties
+          resources:
+            requests:
+              cpu: 400m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 5Gi
+          volumeMounts:
+            - name: mm2-cfg
+              mountPath: /config
+            - name: log4j-config
+              mountPath: /log4j-config
+      volumes:
+        - name: mm2-cfg
+          configMap:
+            name: mm2-cfg
+        - name: log4j-config
+          configMap:
+            name: mm2-log4j-config
