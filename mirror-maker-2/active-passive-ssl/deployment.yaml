@@ -82,6 +82,8 @@ spec:
               value: -Xmx4G -Xms1G
             - name: KAFKA_LOG4J_OPTS
               value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
+            - name: JMX_PORT
+              value: "5555"
           command:
             #  the config is mounted from file generated from a template in the init container
             - /opt/bitnami/kafka/bin/connect-mirror-maker.sh

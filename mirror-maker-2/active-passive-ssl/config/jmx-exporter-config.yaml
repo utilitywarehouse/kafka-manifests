@@ -1,5 +1,5 @@
 # See https://github.com/prometheus/jmx_exporter for more info about JMX Prometheus Exporter metrics
-hostPort: localhost:5556
+jmxUrl: service:jmx:rmi:///jndi/rmi://127.0.0.1:5555/jmxrmi
 rules:
   - pattern: ".*"
 
