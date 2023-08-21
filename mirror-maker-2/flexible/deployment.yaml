@@ -14,6 +14,10 @@ spec:
       labels:
         app: *app
         policy.semaphore.uw.io/name: "mirror-maker-2"
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: '5556'
+        prometheus.io/scrape: "true"
     spec:
       terminationGracePeriodSeconds: 30
       containers:
@@ -25,6 +29,8 @@ spec:
               value: -Xmx4G -Xms500M
             - name: KAFKA_LOG4J_OPTS
               value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
+            - name: JMX_PORT
+              value: "5555"
           command:
             - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
             - /config/connect-mirror-maker.properties
@@ -36,14 +42,33 @@ spec:
               cpu: "2"
               memory: 5Gi
           volumeMounts:
-            - name: mm2-cfg
+            - name: mm2-config
               mountPath: /config
             - name: log4j-config
               mountPath: /log4j-config
+        - name: jmx-exporter
+          image: bitnami/jmx-exporter:0.19.0
+          args: ["5556", "/jmx-exporter-config/config.yaml"]
+          ports:
+            - containerPort: 5556
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 2
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /jmx-exporter-config
+              name: jmx-exporter-config
       volumes:
-        - name: mm2-cfg
+        - name: mm2-config
           configMap:
-            name: mm2-cfg
+            name: mm2-config
         - name: log4j-config
           configMap:
             name: mm2-log4j-config
+        - name: jmx-exporter-config
+          configMap:
+            defaultMode: 420
+            name: mm2-jmx-exporter-config
