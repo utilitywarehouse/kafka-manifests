@@ -104,7 +104,7 @@ spec:
           image: bitnami/jmx-exporter:0.19.0
           args: ["5556", "/jmx-exporter-config/config.yaml"]
           ports:
-            - containerPort: 5555
+            - containerPort: 5556
           resources:
             requests:
               cpu: 100m
