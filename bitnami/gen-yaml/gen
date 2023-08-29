@@ -4,7 +4,7 @@ mkdir -p ${NS}/upstream
 
 # Fetch from helm repo: https://github.com/bitnami/charts/tree/main/bitnami/kafka#installing-the-chart
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm template ${BITNAMI_KAFKA_RELEASE} bitnami/kafka --version ${BITNAMI_KAFKA_RELEASE} -f ${VALUES} --namespace ${NS} > ${NS}/upstream/kafka.yaml
+helm template ${BITNAMI_KAFKA_RELEASE} bitnami/kafka --version ${BITNAMI_KAFKA_RELEASE} -f ${VALUES} --set kraft.clusterId=${KRAFT_CLUSTERID} --namespace ${NS} > ${NS}/upstream/kafka.yaml
 
 cat gen-yaml/clean-upstream-overlay.yaml > ${NS}/upstream/kustomization.yaml
 
