@@ -1,0 +1,13 @@
+#!/bin/sh
+
+mkdir -p ${NS}/upstream
+
+# Fetch from helm repo: https://github.com/bitnami/charts/tree/main/bitnami/kafka#installing-the-chart
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm template ${BITNAMI_KAFKA_RELEASE} bitnami/kafka --version ${BITNAMI_KAFKA_RELEASE} -f ${VALUES} --namespace ${NS} > ${NS}/upstream/kafka.yaml
+
+cat gen-yaml/clean-upstream-overlay.yaml > ${NS}/upstream/kustomization.yaml
+
+if [ ! -f ${NS}/kustomization.yaml ]; then
+cat gen-yaml/configure-logging-overlay.yaml > ${NS}/kustomization.yaml
+fi

@@ -10,4 +10,4 @@ gen-pubsub:
 	  -e VALUES=${VALUES_TLS} \
 	  --workdir=/opt/manifests \
 	  --entrypoint=/bin/sh \
-	  alpine/helm ./gen-yaml
+	  alpine/helm ./gen-yaml/gen
