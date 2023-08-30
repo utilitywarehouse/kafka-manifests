@@ -6,8 +6,8 @@ mkdir -p ${NS}/upstream
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm template ${BITNAMI_KAFKA_RELEASE} bitnami/kafka --version ${BITNAMI_KAFKA_RELEASE} -f ${VALUES} --set fullnameOverride=${NAME} --set nameOverride=${NAME} --set kraft.clusterId=${KRAFT_CLUSTERID} --set auth.tls.existingSecrets="{${NAME}-0-tls,${NAME}-1-tls,${NAME}-2-tls}" --namespace ${NS} > ${NS}/upstream/kafka.yaml
 
-cat gen-yaml/clean-upstream-overlay.yaml > ${NS}/upstream/kustomization.yaml
+cat gen-yaml/clean-upstream-kustomize-template.yaml > ${NS}/upstream/kustomization.yaml
 
 if [ ! -f ${NS}/kustomization.yaml ]; then
-cat gen-yaml/configure-logging-overlay.yaml > ${NS}/kustomization.yaml
+cat gen-yaml/namespace-kustomize-template.yaml > ${NS}/kustomization.yaml
 fi
