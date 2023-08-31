@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
 automountServiceAccountToken: true
@@ -22,7 +22,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
   annotations:
@@ -37,7 +37,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
 data:
@@ -104,7 +104,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
 data:
   setup.sh: |-
@@ -181,7 +181,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
   annotations:
@@ -199,7 +199,7 @@ spec:
       targetPort: metrics
   selector:
     app.kubernetes.io/name: kafka-shared
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/kafka-metrics-svc.yaml
@@ -211,7 +211,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
   annotations:
@@ -229,7 +229,7 @@ spec:
       targetPort: metrics
   selector:
     app.kubernetes.io/name: kafka-shared
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: cluster-metrics
 ---
 # Source: kafka/templates/svc-headless.yaml
@@ -241,7 +241,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
 spec:
@@ -263,7 +263,7 @@ spec:
       targetPort: kafka-ctlr
   selector:
     app.kubernetes.io/name: kafka-shared
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/svc.yaml
@@ -275,7 +275,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
 spec:
@@ -289,7 +289,7 @@ spec:
       nodePort: null
   selector:
     app.kubernetes.io/name: kafka-shared
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: kafka
 ---
 # Source: kafka/templates/kafka-metrics-deployment.yaml
@@ -301,7 +301,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
 spec:
@@ -309,14 +309,14 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kafka-shared
-      app.kubernetes.io/instance: 22.0.0
+      app.kubernetes.io/instance: 22.1.1
       app.kubernetes.io/component: cluster-metrics
   template:
     metadata:
       labels:
         app.kubernetes.io/name: kafka-shared
         helm.sh/chart: kafka-22.1.1
-        app.kubernetes.io/instance: 22.0.0
+        app.kubernetes.io/instance: 22.1.1
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: cluster-metrics
       annotations:
@@ -331,7 +331,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     app.kubernetes.io/name: kafka-shared
-                    app.kubernetes.io/instance: 22.0.0
+                    app.kubernetes.io/instance: 22.1.1
                     app.kubernetes.io/component: metrics
                 topologyKey: kubernetes.io/hostname
               weight: 1
@@ -386,7 +386,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-shared
     helm.sh/chart: kafka-22.1.1
-    app.kubernetes.io/instance: 22.0.0
+    app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
 spec:
@@ -395,7 +395,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kafka-shared
-      app.kubernetes.io/instance: 22.0.0
+      app.kubernetes.io/instance: 22.1.1
       app.kubernetes.io/component: kafka
   serviceName: kafka-shared-headless
   updateStrategy:
@@ -406,11 +406,11 @@ spec:
       labels:
         app.kubernetes.io/name: kafka-shared
         helm.sh/chart: kafka-22.1.1
-        app.kubernetes.io/instance: 22.0.0
+        app.kubernetes.io/instance: 22.1.1
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kafka
       annotations:
-        checksum/jmx-configuration: 550ac38e32ea016567c2ad3960ac1fb954521f7105553275a704a44b11e7d911
+        checksum/jmx-configuration: 5cfdb963c2ba682fa1a61c79ccabf53bd9ff2f358679aec05fb61494f42dccf5
     spec:
       
       hostNetwork: false
@@ -424,7 +424,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     app.kubernetes.io/name: kafka-shared
-                    app.kubernetes.io/instance: 22.0.0
+                    app.kubernetes.io/instance: 22.1.1
                     app.kubernetes.io/component: kafka
                 topologyKey: kubernetes.io/hostname
               weight: 1

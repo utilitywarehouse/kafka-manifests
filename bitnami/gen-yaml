@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Fetch from helm repo: https://github.com/bitnami/charts/tree/main/bitnami/kafka#installing-the-chart
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm template ${BITNAMI_KAFKA_RELEASE} bitnami/kafka -f values-shared.yaml --namespace pubsub > shared/upstream/kafka.yaml

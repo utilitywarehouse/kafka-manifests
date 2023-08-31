@@ -1,11 +1,8 @@
-fullnameOverride: kafka-shared
-nameOverride: kafka-shared
 replicaCount: 3
 kraft:
   enabled: true
   processRoles: broker,controller
   controllerListenerNames: CONTROLLER
-  clusterId: k6fA260ZKAhRUMBN7aMApm # cat /proc/sys/kernel/random/uuid | tr -d '-' | base64 | cut -b 1-22
 existingLog4jConfigMap: kafka-log4j-config
 service:
   headless:
@@ -30,7 +27,3 @@ auth:
   tls:
     type: pem
     endpointIdentificationAlgorithm: "" # Default is https and will mean that it will try verify clients address in the passed cert
-    existingSecrets:
-      - kafka-shared-0-tls
-      - kafka-shared-1-tls
-      - kafka-shared-2-tls
