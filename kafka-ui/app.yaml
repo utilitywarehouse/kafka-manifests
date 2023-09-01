@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app kafka-ui
+  labels:
+    app: *app
+    app.kubernetes.io/name: *app
+spec:
+  ports:
+    - name: http
+      port: 8080
+  selector:
+    app: *app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app kafka-ui
+  annotations:
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/tier": "tier_3"
+    "app.uw.systems/description": "UI for interacting with the Kafka Cluster using https://docs.kafka-ui.provectus.io"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+        app.kubernetes.io/name: *app
+        policy.semaphore.uw.io/name: "kafka-ui"
+    spec:
+      terminationGracePeriodSeconds: 300
+      containers:
+        - name: *app
+          imagePullPolicy: Always
+          image: provectuslabs/kafka-ui:v0.7.1
+          env:
+            # We need to list here all the config files loaded in the kafka-ui-config ConfigMap.
+            # Although Spring Boot should support just setting the value to the folder "file:/kafka-ui-config/" as stated here: https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.files.optional-prefix,
+            # the config files are not picked up when the value is set like that
+            - name: SPRING_CONFIG_ADDITIONAL-LOCATION
+              value: "file:/kafka-ui-config/clusters.yaml;file:/kafka-ui-config/auth.yaml;file:/kafka-ui-config/rbac.yaml"
+            - name: DYNAMIC_CONFIG_ENABLED
+              value: "false"
+          volumeMounts:
+            - name: kafka-ui-config
+              mountPath: /kafka-ui-config
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        # holds all the config files loaded from a config map
+        - name: kafka-ui-config
+          configMap:
+            name: kafka-ui-config
