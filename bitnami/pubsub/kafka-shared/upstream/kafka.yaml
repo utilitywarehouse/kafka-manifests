@@ -483,9 +483,9 @@ spec:
             - name: KAFKA_LOG_DIR
               value: "/opt/bitnami/kafka/logs"
             - name: KAFKA_CFG_DELETE_TOPIC_ENABLE
-              value: "false"
-            - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
               value: "true"
+            - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+              value: "false"
             - name: KAFKA_HEAP_OPTS
               value: "-Xmx1024m -Xms1024m"
             - name: KAFKA_CFG_LOG_FLUSH_INTERVAL_MESSAGES
@@ -505,21 +505,21 @@ spec:
             - name: KAFKA_CFG_LOG_DIRS
               value: "/bitnami/kafka/data"
             - name: KAFKA_CFG_DEFAULT_REPLICATION_FACTOR
-              value: "1"
+              value: "3"
             - name: KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR
-              value: "1"
+              value: "3"
             - name: KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
-              value: "1"
+              value: "3"
             - name: KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR
-              value: "1"
+              value: "2"
             - name: KAFKA_CFG_NUM_IO_THREADS
               value: "8"
             - name: KAFKA_CFG_NUM_NETWORK_THREADS
-              value: "3"
+              value: "15"
             - name: KAFKA_CFG_NUM_PARTITIONS
-              value: "1"
+              value: "15"
             - name: KAFKA_CFG_NUM_RECOVERY_THREADS_PER_DATA_DIR
-              value: "1"
+              value: "8"
             - name: KAFKA_CFG_SOCKET_RECEIVE_BUFFER_BYTES
               value: "102400"
             - name: KAFKA_CFG_SOCKET_REQUEST_MAX_BYTES
@@ -542,6 +542,8 @@ spec:
               value: "CONTROLLER"  
             - name: KAFKA_ENABLE_KRAFT
               value: "true"
+            - name: KAFKA_CFG_MIN_INSYNC_REPLICAS
+              value: "2"
           ports:
             - name: kafka-client
               containerPort: 9092
