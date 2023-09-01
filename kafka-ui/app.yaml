@@ -45,6 +45,10 @@ spec:
               value: "file:/kafka-ui-config/clusters.yaml;file:/kafka-ui-config/auth.yaml;file:/kafka-ui-config/rbac.yaml"
             - name: DYNAMIC_CONFIG_ENABLED
               value: "false"
+            - name: LOGGING_LEVEL_ROOT
+              value: "info"
+            - name: LOGGING_LEVEL_COM_PROVECTUS
+              value: "info"
           volumeMounts:
             - name: kafka-ui-config
               mountPath: /kafka-ui-config
