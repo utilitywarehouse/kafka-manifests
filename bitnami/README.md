@@ -36,10 +36,11 @@ gen-pubsub:
 * execute the target - this will create a new dir containing the base
 ```
 pubsub
-├── kustomization.yaml
-└── upstream
-    ├── kafka.yaml
-    └── kustomization.yaml
+└── kafka-shared
+    ├── kustomization.yaml
+    └── upstream
+        ├── kafka.yaml
+        └── kustomization.yaml
 ```
 * add more resources to be base if needed
 * PR the changes
