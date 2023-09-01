@@ -3,14 +3,13 @@ kind: Service
 metadata:
   name: &app kafka-ui
   labels:
-    app: *app
     app.kubernetes.io/name: *app
 spec:
   ports:
     - name: http
       port: 8080
   selector:
-    app: *app
+    app.kubernetes.io/name: *app
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,7 +23,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: *app
+      app.kubernetes.io/name: *app
   template:
     metadata:
       labels:
@@ -32,7 +31,7 @@ spec:
         app.kubernetes.io/name: *app
         policy.semaphore.uw.io/name: "kafka-ui"
     spec:
-      terminationGracePeriodSeconds: 300
+      terminationGracePeriodSeconds: 30
       containers:
         - name: *app
           imagePullPolicy: Always
@@ -63,6 +62,27 @@ spec:
             requests:
               cpu: 200m
               memory: 256Mi
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
       volumes:
         # holds all the config files loaded from a config map
         - name: kafka-ui-config
