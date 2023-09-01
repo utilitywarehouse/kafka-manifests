@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - upstream
-  - ../shared/logging
+  - ../../shared/logging
   - certs.yaml
 
 patches:
