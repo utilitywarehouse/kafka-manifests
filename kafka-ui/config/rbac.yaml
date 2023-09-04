@@ -1,0 +1,68 @@
+# See https://docs.kafka-ui.provectus.io/configuration/rbac-role-based-access-control
+# Commented out is a sample on how to configure based on oauth2 auth
+
+# NOTE: to pick up values from environment variables, you just need to use the format ${ENV_VAR_NAME}
+
+#rbac:
+#  roles:
+#    # Read-only
+#    - name: "readonly"
+#      clusters:
+#        - TBD
+#      subjects:
+#        - provider: oauth
+#          type: role
+#          value: "uw_rg_technology"
+#      permissions:
+#        - resource: clusterconfig
+#          value: ".*"
+#          actions: [ "view" ]
+#
+#        - resource: topic
+#          value: ".*"
+#          actions: [ view ]
+#
+#        - resource: consumer
+#          value: ".*"
+#          actions: [ view ]
+#
+#        - resource: schema
+#          value: ".*"
+#          actions: [ view ]
+#
+#        - resource: acl
+#          value: ".*"
+#          actions: [ view ]
+#
+#    # Admins
+#    - name: "admins"
+#      clusters:
+#        - TBD
+#      subjects:
+#        - provider: oauth
+#          type: user
+#          value: "email@uw.co.uk"
+#      permissions:
+#        - resource: applicationconfig
+#          value: ".*"
+#          actions: all
+#
+#        - resource: clusterconfig
+#          value: ".*"
+#          actions: all
+#
+#        - resource: topic
+#          value: ".*"
+#          actions: all
+#
+#        - resource: consumer
+#          value: ".*"
+#          actions: all
+#
+#        - resource: schema
+#          value: ".*"
+#          actions: all
+#
+#        - resource: acl
+#          value: ".*"
+#          actions: [ view ]
