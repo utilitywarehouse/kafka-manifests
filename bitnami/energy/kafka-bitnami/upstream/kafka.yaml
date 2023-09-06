@@ -3,10 +3,10 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kafka-energy-exporter
+  name: kafka-bitnami-exporter
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -17,10 +17,10 @@ automountServiceAccountToken: true
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kafka-energy
+  name: kafka-bitnami
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -32,10 +32,10 @@ automountServiceAccountToken: true
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kafka-energy-jmx-configuration
+  name: kafka-bitnami-jmx-configuration
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -99,10 +99,10 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kafka-energy-scripts
+  name: kafka-bitnami-scripts
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -110,7 +110,7 @@ data:
   setup.sh: |-
     #!/bin/bash
 
-    ID="${MY_POD_NAME#"kafka-energy-"}"
+    ID="${MY_POD_NAME#"kafka-bitnami-"}"
     # If process.roles is not set at all, it is assumed to be in ZooKeeper mode.
     # https://kafka.apache.org/documentation/#kraft_role
     
@@ -133,7 +133,7 @@ data:
         pod_id=0
         while :
         do 
-            VOTERS="${VOTERS}$node_id@kafka-energy-$pod_id.kafka-energy-headless.energy.svc.cluster.local:9093"
+            VOTERS="${VOTERS}$node_id@kafka-bitnami-$pod_id.kafka-bitnami-headless.energy.svc.cluster.local:9093"
             node_id=$(( $node_id + 1 ))
             pod_id=$(( $pod_id + 1 ))
             if [[ $pod_id -ge 3 ]]; then
@@ -153,10 +153,10 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-energy-jmx-metrics
+  name: kafka-bitnami-jmx-metrics
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -175,7 +175,7 @@ spec:
       protocol: TCP
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: kafka
 ---
@@ -183,10 +183,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-energy-metrics
+  name: kafka-bitnami-metrics
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -205,7 +205,7 @@ spec:
       protocol: TCP
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: cluster-metrics
 ---
@@ -213,10 +213,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-energy-headless
+  name: kafka-bitnami-headless
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -239,7 +239,7 @@ spec:
       port: 9093
       targetPort: kafka-ctlr
   selector:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: kafka
 ---
@@ -247,10 +247,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-energy
+  name: kafka-bitnami
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -265,7 +265,7 @@ spec:
       targetPort: kafka-client
       nodePort: null
   selector:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/component: kafka
 ---
@@ -273,10 +273,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kafka-energy-exporter
+  name: kafka-bitnami-exporter
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -285,13 +285,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka-energy
+      app.kubernetes.io/name: kafka-bitnami
       app.kubernetes.io/instance: 22.1.1
       app.kubernetes.io/component: cluster-metrics
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka-energy
+        app.kubernetes.io/name: kafka-bitnami
         helm.sh/chart: kafka-22.1.1
         app.kubernetes.io/instance: 22.1.1
         app.kubernetes.io/managed-by: Helm
@@ -307,7 +307,7 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: kafka-energy
+                    app.kubernetes.io/name: kafka-bitnami
                     app.kubernetes.io/instance: 22.1.1
                     app.kubernetes.io/component: metrics
                 topologyKey: kubernetes.io/hostname
@@ -316,7 +316,7 @@ spec:
           
       securityContext:
         fsGroup: 1001
-      serviceAccountName: kafka-energy-exporter
+      serviceAccountName: kafka-bitnami-exporter
       containers:
         - name: kafka-exporter
           image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r86
@@ -330,9 +330,9 @@ spec:
             - -ce
             - |
               kafka_exporter \
-              --kafka.server=kafka-energy-0.kafka-energy-headless.energy.svc.cluster.local:9092 \
-              --kafka.server=kafka-energy-1.kafka-energy-headless.energy.svc.cluster.local:9092 \
-              --kafka.server=kafka-energy-2.kafka-energy-headless.energy.svc.cluster.local:9092 \
+              --kafka.server=kafka-bitnami-0.kafka-bitnami-headless.energy.svc.cluster.local:9092 \
+              --kafka.server=kafka-bitnami-1.kafka-bitnami-headless.energy.svc.cluster.local:9092 \
+              --kafka.server=kafka-bitnami-2.kafka-bitnami-headless.energy.svc.cluster.local:9092 \
               --web.listen-address=:9308
           ports:
             - name: metrics
@@ -347,10 +347,10 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: kafka-energy
+  name: kafka-bitnami
   namespace: "energy"
   labels:
-    app.kubernetes.io/name: kafka-energy
+    app.kubernetes.io/name: kafka-bitnami
     helm.sh/chart: kafka-22.1.1
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
@@ -360,23 +360,23 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka-energy
+      app.kubernetes.io/name: kafka-bitnami
       app.kubernetes.io/instance: 22.1.1
       app.kubernetes.io/component: kafka
-  serviceName: kafka-energy-headless
+  serviceName: kafka-bitnami-headless
   updateStrategy:
     rollingUpdate: {}
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka-energy
+        app.kubernetes.io/name: kafka-bitnami
         helm.sh/chart: kafka-22.1.1
         app.kubernetes.io/instance: 22.1.1
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kafka
       annotations:
-        checksum/jmx-configuration: a1172e729a69e9be0ac2259b800ff863a12551ff7fe1cf1b081df78081c54528
+        checksum/jmx-configuration: 272497f2e35263ef617a6380a712a01b59f87a3e465522608234fc449272e2b8
     spec:
       
       hostNetwork: false
@@ -389,7 +389,7 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: kafka-energy
+                    app.kubernetes.io/name: kafka-bitnami
                     app.kubernetes.io/instance: 22.1.1
                     app.kubernetes.io/component: kafka
                 topologyKey: kubernetes.io/hostname
@@ -398,7 +398,7 @@ spec:
           
       securityContext:
         fsGroup: 1001
-      serviceAccountName: kafka-energy
+      serviceAccountName: kafka-bitnami
       containers:
         - name: kafka
           image: docker.io/bitnami/kafka:3.4.0-debian-11-r28
@@ -429,7 +429,7 @@ spec:
             - name: KAFKA_CFG_LISTENERS
               value: "INTERNAL://:9094,CLIENT://:9092,CONTROLLER://:9093"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: "INTERNAL://$(MY_POD_NAME).kafka-energy-headless.energy.svc.cluster.local:9094,CLIENT://$(MY_POD_NAME).kafka-energy-headless.energy.svc.cluster.local:9092"
+              value: "INTERNAL://$(MY_POD_NAME).kafka-bitnami-headless.energy.svc.cluster.local:9094,CLIENT://$(MY_POD_NAME).kafka-bitnami-headless.energy.svc.cluster.local:9092"
             - name: ALLOW_PLAINTEXT_LISTENER
               value: "yes"
             - name: KAFKA_ZOOKEEPER_PROTOCOL
@@ -570,11 +570,11 @@ spec:
         
         - name: scripts
           configMap:
-            name: kafka-energy-scripts
+            name: kafka-bitnami-scripts
             defaultMode: 0755
         - name: jmx-config
           configMap:
-            name: kafka-energy-jmx-configuration
+            name: kafka-bitnami-jmx-configuration
         - name: logs
           emptyDir: {}
   volumeClaimTemplates:
