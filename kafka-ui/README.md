@@ -1,7 +1,6 @@
 # kafka-ui kustomization base
 
 This folder contains a kustomization base for [kafka-ui](https://github.com/provectus/kafka-ui).
-Details on its features can be discovered by following this [link](https://github.com/provectus/kafka-ui). 
 
 ## How to use
 This base contains an empty configuration with commented out samples. See the [config](config) folder.
