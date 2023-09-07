@@ -9,7 +9,7 @@ The config files are loaded through a [generated ConfigMap](https://github.com/u
 [an environment variable as config files](https://github.com/utilitywarehouse/kafka-manifests/blob/75d31cd84633ffb36c7c7618dc725110b0d4c82c/kafka-ui/app.yaml#L41-L45) to Spring Boot.
 
 When using this base you'll need to fill in the configuration files with what suits you and replace the ConfigMap in the final kustomization file: 
-```shell
+```yaml
 configMapGenerator:
   - name: kafka-ui-config
     behavior: replace
