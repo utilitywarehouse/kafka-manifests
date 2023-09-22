@@ -7,9 +7,6 @@ metadata:
     "app.uw.systems/name": "Kafka lag monitor"
     "app.uw.systems/description": "Generates metrics in order to power Kafka dashboards and alerts"
     "app.uw.systems/tier": "tier_4"
-    prometheus.io/path: "/__/metrics"
-    prometheus.io/port: "8081"
-    prometheus.io/scrape: "true"
   labels:
     app: *app
     app.kubernetes.io/name: *app
@@ -23,6 +20,10 @@ spec:
   template:
     metadata:
       name: *app
+      annotations:
+        prometheus.io/path: "/__/metrics"
+        prometheus.io/port: "8081"
+        prometheus.io/scrape: "true"
       labels:
         app: *app
         app.kubernetes.io/name: *app
