@@ -44,3 +44,16 @@ gen-energy-kafka-non-tls:
 	  --workdir=/opt/manifests \
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
+
+.PHONY: gen-energy-platform-bitnami-kafka-non-tls
+gen-energy-platform-bitnami-kafka-non-tls:
+	docker run -ti --rm \
+	  -v $${PWD}:/opt/manifests \
+	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
+	  -e NS="energy-platform" \
+	  -e NAME="kafka-bitnami" \
+	  -e KRAFT_CLUSTERID="NTA2QzRCNkM0NUI4NEY0OU" \
+	  -e VALUES=${VALUES_NON_TLS} \
+	  --workdir=/opt/manifests \
+	  --entrypoint=/bin/sh \
+	  alpine/helm ./gen-yaml/gen
