@@ -1,0 +1,22 @@
+# See https://docs.kafka-ui.provectus.io/configuration/authentication for configuring the authentication.
+# Commented out is a sample on how to configure it with UW Okta
+
+# NOTE: to pick up values from environment variables, you just need to use the format ${ENV_VAR_NAME}
+
+#auth:
+#  oauth2:
+#    client:
+#      okta:
+#        clientId: ${OKTA_CLIENT_ID}
+#        clientSecret: ${OKTA_CLIENT_SECRET}
+#        scope: [ 'openid', 'profile', 'email', 'groups' ]
+#        client-name: Okta
+#        provider: okta
+#        redirect-uri: TBD
+#        authorization-grant-type: authorization_code
+#        issuer-uri: https://login.uw.systems/oauth2/default
+#        jwk-set-uri: https://login.uw.systems/oauth2/default/v1/keys
+#        user-name-attribute: email
+#        custom-params:
+#          type: oauth
+#          roles-field: groups

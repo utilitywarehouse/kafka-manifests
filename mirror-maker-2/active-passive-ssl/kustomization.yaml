@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+configMapGenerator:
+  - name: mm2-config-template
+    files:
+      - connect-mirror-maker-template.properties=config/connect-mirror-maker-template.properties
+  - name: mm2-log4j-config
+    files:
+      - connect-log4j.properties=config/connect-log4j.properties
+  - name: mm2-jmx-exporter-config
+    files:
+      - config.yaml=config/jmx-exporter-config.yaml

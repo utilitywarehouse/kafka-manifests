@@ -1,0 +1,43 @@
+replicaCount: 3
+kraft:
+  enabled: true
+  processRoles: broker,controller
+  controllerListenerNames: CONTROLLER
+deleteTopicEnable: true
+autoCreateTopicsEnable: false
+defaultReplicationFactor: 3
+offsetsTopicReplicationFactor: 3
+transactionStateLogReplicationFactor: 3
+transactionStateLogMinIsr: 2
+numIoThreads: 8
+numNetworkThreads: 15
+numPartitions: 15
+numRecoveryThreadsPerDataDir: 8
+uncleanLeaderElectionEnable: false
+extraEnvVars:
+  - name: KAFKA_CFG_MIN_INSYNC_REPLICAS
+    value: "2"
+existingLog4jConfigMap: kafka-log4j-config
+service:
+  headless:
+    publishNotReadyAddresses: true
+zookeeper:
+  enabled: false
+metrics:
+  kafka:
+    enabled: true
+    certificatesSecret: kafka-exporter-cert
+    tlsCert: tls.crt
+    tlsKey: tls.key
+    tlsCaCert: ca.crt
+  jmx:
+    enabled: true
+allowEveryoneIfNoAclFound: false
+authorizerClassName: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+auth:
+  clientProtocol: mtls
+  interBrokerProtocol: tls
+  controllerProtocol: tls
+  tls:
+    type: pem
+    endpointIdentificationAlgorithm: "" # Default is https and will mean that it will try verify clients address in the passed cert

@@ -1,0 +1,32 @@
+# See https://docs.kafka-ui.provectus.io/configuration/configuration-file#basic-config-structure
+# Commented out is a sample on how to configure a simple cluster and a ssl access cluster
+
+# NOTE: to pick up values from environment variables, you just need to use the format ${ENV_VAR_NAME}
+
+#kafka:
+#  clusters:
+#    - name: ssl-enabled
+#      bootstrapServers: broker-0:9092,broker-1:9092
+#      properties:
+#        security:
+#          protocol: SSL
+#        ssl:
+#          keystore:
+#            password: ${JKS_PASSWORD}
+#            location: /kafka-client-certificate/keystore.jks
+#          truststore:
+#            password: ${JKS_PASSWORD}
+#            location: /kafka-client-certificate/truststore.jks
+#      metrics:
+#        port: 5556
+#        type: PROMETHEUS
+#    - name: local
+#      bootstrapServers: localhost:29091
+#      schemaRegistry: http://localhost:8085
+#      schemaRegistryAuth:
+#        username: username
+#        password: password
+#      schemaNameTemplate: "%s-value"
+#      metrics:
+#        port: 9997
+#        type: JMX

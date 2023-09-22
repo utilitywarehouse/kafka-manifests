@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &app mm2
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: *app
+  template:
+    metadata:
+      labels:
+        app: *app
+        policy.semaphore.uw.io/name: "mirror-maker-2"
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: '5556'
+        prometheus.io/scrape: "true"
+    spec:
+      terminationGracePeriodSeconds: 30
+      initContainers:
+        # populate config from environment variables
+        - name: render-config
+          image: alpine
+          args:
+            - /bin/sh
+            - -c
+            # use gomplate for rendering the go template
+            - |
+              apk add --no-cache gomplate;
+              gomplate -f /config-template/connect-mirror-maker-template.properties -o ./config/connect-mirror-maker.properties
+
+          env:
+            - name: SOURCE_NAME
+              value: source
+            - name: SOURCE_BOOTSTRAP_SERVERS
+              value: source:9092
+            - name: TARGET_NAME
+              value: target
+            - name: TARGET_BOOTSTRAP_SERVERS
+              value: target:9092
+            - name: TOPICS
+              value: ".*"
+            - name: GROUPS
+              value: ".*"
+            # if set to true, the source name will be added as a prefix to the replicated topics in the target cluster.
+            # Example: with source name set to 'otel', when replicating topic otlp_spans, the topic name in the target will be 'otel.otlp_spans'
+            - name: TARGET_TOPICS_ADD_CLUSTER_PREFIX
+              value: "false"
+            - name: SYNC_TOPIC_CONFIGS
+              value: "true"
+            - name: SYNC_TOPIC_ACLS
+              value: "false"
+            # When source has SSL enabled, mirror maker uses JKS keystore and truststore encrypted by password to connect. Use properties below
+            - name: SOURCE_SSL_ENABLE
+              value: "false"
+            # The location to the JKS truststore
+            - name: SOURCE_TRUSTSTORE
+            - name: SOURCE_TRUSTSTORE_PASSWORD
+            # The location to the JKS keystore
+            - name: SOURCE_KEYSTORE
+            - name: SOURCE_KEYSTORE_PASSWORD
+
+            # When target has SSL enabled, mirror maker uses JKS keystore and truststore encrypted by password to connect. Use properties below
+            - name: TARGET_SSL_ENABLE
+              value: "false"
+            # The location to the JKS truststore
+            - name: TARGET_TRUSTSTORE
+            - name: TARGET_TRUSTSTORE_PASSWORD
+            # The location to the JKS keystore
+            - name: TARGET_KEYSTORE
+            - name: TARGET_KEYSTORE_PASSWORD
+          volumeMounts:
+            - name: mm2-config
+              mountPath: /config
+            - name: mm2-config-template
+              mountPath: /config-template
+      containers:
+        - name: *app
+          imagePullPolicy: IfNotPresent
+          image: bitnami/kafka:3.4
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx4G -Xms1G
+            - name: KAFKA_LOG4J_OPTS
+              value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
+            - name: JMX_PORT
+              value: "5555"
+          command:
+            #  the config is mounted from file generated from a template in the init container
+            - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
+            - /config/connect-mirror-maker.properties
+          resources:
+            requests:
+              cpu: 400m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 5Gi
+          volumeMounts:
+            - name: mm2-config
+              mountPath: /config
+            - name: log4j-config
+              mountPath: /log4j-config
+        - name: jmx-exporter
+          image: bitnami/jmx-exporter:0.19.0
+          args: ["5556", "/jmx-exporter-config/config.yaml"]
+          ports:
+            - containerPort: 5556
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 2
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /jmx-exporter-config
+              name: jmx-exporter-config
+      volumes:
+        - name: mm2-config-template
+          configMap:
+            name: mm2-config-template
+        - name: mm2-config
+          emptyDir: {}
+        - name: log4j-config
+          configMap:
+            name: mm2-log4j-config
+        - name: jmx-exporter-config
+          configMap:
+            defaultMode: 420
+            name: mm2-jmx-exporter-config
+
