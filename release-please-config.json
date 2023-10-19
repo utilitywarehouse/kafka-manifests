@@ -1,0 +1,15 @@
+{
+    "versioning": "prerelease",
+    "tag-separator": "-",
+    "separate-pull-requests": true,
+    "bump-minor-pre-major": false,
+    "bump-patch-for-minor-pre-major": false,
+    "packages": {
+        "kafka-ui": {
+            "package-name": "kafka-ui"
+        },
+        "mirror-maker-2": {
+            "package-name": "mirror-maker-2"
+        }
+    }
+}
