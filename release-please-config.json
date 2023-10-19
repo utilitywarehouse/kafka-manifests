@@ -1,4 +1,6 @@
 {
+    "tag-separator": "-",
+    "separate-pull-requests": true,
     "packages": {
         "kafka-ui": {
             "package-name": "kafka-ui-v0.7.1"
