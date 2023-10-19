@@ -8,6 +8,7 @@ This repository provides a kustomize base to deploy a kafka cluster
 - Zookeeper
 - lag-monitor
 - [mirror-maker 2](mirror-maker-2)
+- [kafka-ui](./kafka-ui)
 
 ## Versioning
 
