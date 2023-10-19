@@ -6,7 +6,7 @@
             "package-name": "kafka-ui-v0.7.1"
         },
         "mirror-maker-2": {
-            "package-name": "mirror-maker-2-v3.x"
+            "package-name": "mirror-maker-2-v4.x"
         }
     }
 }

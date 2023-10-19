@@ -24,7 +24,7 @@ spec:
       containers:
         - name: *app
           imagePullPolicy: IfNotPresent
-          image: bitnami/kafka:3.4
+          image: bitnami/kafka:4.0
           env:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx4G -Xms500M
