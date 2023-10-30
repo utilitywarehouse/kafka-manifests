@@ -1,0 +1,30 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-defaukt-renewbefore
+  annotations:
+    policies.kyverno.io/title: Require certificate renewBefore to be set to 2/3rds of duration
+    policies.kyverno.io/category: cert-manager
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Certificate
+    policies.kyverno.io/description: >-
+      certificate requests should set renewBefore to 2/3rds of duration
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-certificate-default-renewbefore
+      match:
+        resources:
+          kinds:
+            - Certificate
+      preconditions:
+        any:
+          - key: "{{ request.object.spec.issuerRef.name || '' }}"
+            operator: Equals
+            value: kafka-shared-selfsigned-issuer
+      validate:
+        message: "renewBefore must be unset or set to 2/3 of duration, which is required to be 168hrs currently (7 days)"
+        pattern:
+          spec:
+            =(renewBefore): "112h"
