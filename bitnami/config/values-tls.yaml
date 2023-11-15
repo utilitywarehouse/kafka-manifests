@@ -3,6 +3,8 @@ kraft:
   enabled: true
   processRoles: broker,controller
   controllerListenerNames: CONTROLLER
+startupProbe:
+  enabled: true
 deleteTopicEnable: true
 autoCreateTopicsEnable: false
 defaultReplicationFactor: 3
