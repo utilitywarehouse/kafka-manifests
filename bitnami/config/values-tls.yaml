@@ -5,6 +5,7 @@ kraft:
   controllerListenerNames: CONTROLLER
 startupProbe:
   enabled: true
+  initialDelaySeconds: 10
 deleteTopicEnable: true
 autoCreateTopicsEnable: false
 defaultReplicationFactor: 3

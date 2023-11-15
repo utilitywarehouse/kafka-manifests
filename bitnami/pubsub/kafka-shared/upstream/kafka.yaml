@@ -569,7 +569,7 @@ spec:
               port: kafka-client
           startupProbe:
             failureThreshold: 15
-            initialDelaySeconds: 30
+            initialDelaySeconds: 10
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
