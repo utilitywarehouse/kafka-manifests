@@ -70,3 +70,16 @@ gen-finance-platform-bitnami-kafka-non-tls:
 	  --workdir=/opt/manifests \
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
+
+.PHONY: gen-customer-billing-kafka-non-tls
+gen-customer-billing-kafka-non-tls:
+	docker run -ti --rm \
+ 	  -v $${PWD}:/opt/manifests \
+ 	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
+ 	  -e NS="customer-billing" \
+ 	  -e NAME="kafka-bitnami" \
+ 	  -e KRAFT_CLUSTERID="aCMuHORST5K9Rcvk-yWw7Q" \
+ 	  -e VALUES=${VALUES_NON_TLS} \
+ 	  --workdir=/opt/manifests \
+ 	  --entrypoint=/bin/sh \
+ 	  alpine/helm ./gen-yaml/gen
