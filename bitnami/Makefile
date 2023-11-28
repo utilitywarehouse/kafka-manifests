@@ -19,6 +19,19 @@ gen-pubsub-kafka-shared:
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
 
+.PHONY: gen-pubsub-kafka-temp-test
+gen-pubsub-kafka-temp-test:
+	docker run -ti --rm \
+	  -v $${PWD}:/opt/manifests \
+	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
+	  -e NS="pubsub" \
+	  -e NAME="kafka-temp-test" \
+	  -e KRAFT_CLUSTERID="NTgwQ0E5RTNEOTRDNDE1NE" \
+	  -e VALUES=${VALUES_NON_TLS} \
+	  --workdir=/opt/manifests \
+	  --entrypoint=/bin/sh \
+	  alpine/helm ./gen-yaml/gen
+
 .PHONY: gen-pubsub-kafka-non-tls
 gen-pubsub-kafka-non-tls:
 	docker run -ti --rm \
