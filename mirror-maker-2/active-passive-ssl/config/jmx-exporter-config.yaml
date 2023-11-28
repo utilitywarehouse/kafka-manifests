@@ -62,11 +62,12 @@ rules:
   #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}"
   #kafka.consumer:type=consumer-coordinator-metrics,client-id="{clientid}"
   #kafka.consumer:type=consumer-metrics,client-id="{clientid}"
-  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.*)><>(.+-total|.+-bytes)
+  #kafka.consumer:type=producer-metrics,client-id="{clientid}"
+  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.*)><>(.+-record-.+|.+-error-.+|.+-outgoing-.+|.+-incoming-.+)
     name: kafka_$2_$4
     labels:
       clientId: "$3"
-    help: "Kafka $1 JMX metric type $2"
+    help: "Kafka $1 JMX metric type $2 by client-id"
     cache: true
     type: GAUGE
 
