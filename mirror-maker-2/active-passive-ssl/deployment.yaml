@@ -106,6 +106,7 @@ spec:
               mountPath: /log4j-config
         - name: jmx-exporter
           image: bitnami/jmx-exporter:0.20.0
+          command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jmx_prometheus_httpserver.jar"]
           args: ["5556", "/jmx-exporter-config/config.yaml"]
           ports:
             - containerPort: 5556
@@ -128,8 +129,8 @@ spec:
               cpu: 100m
               memory: 100Mi
             limits:
-              cpu: 3
-              memory: 1Gi
+              cpu: 2
+              memory: 1.5Gi
           volumeMounts:
             - mountPath: /jmx-exporter-config
               name: jmx-exporter-config
