@@ -109,6 +109,18 @@ spec:
           args: ["5556", "/jmx-exporter-config/config.yaml"]
           ports:
             - containerPort: 5556
+          livenessProbe:
+            tcpSocket:
+              port: 5556
+            initialDelaySeconds: 15
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5556
+            initialDelaySeconds: 30
+            # it has been reported that in cases with many topics to synchronize, it takes a long time for the first request.
+            timeoutSeconds: 300
           resources:
             requests:
               cpu: 100m
