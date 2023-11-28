@@ -26,7 +26,7 @@ spec:
           image: bitnami/kafka:3.4
           env:
             - name: KAFKA_HEAP_OPTS
-              value: -Xmx4G -Xms500M
+              value: -Xmx4G -Xms1G
             - name: KAFKA_LOG4J_OPTS
               value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
             - name: JMX_PORT
@@ -39,7 +39,7 @@ spec:
               cpu: 400m
               memory: 1Gi
             limits:
-              cpu: "2"
+              cpu: "6"
               memory: 5Gi
           volumeMounts:
             - name: mm2-config
@@ -47,17 +47,32 @@ spec:
             - name: log4j-config
               mountPath: /log4j-config
         - name: jmx-exporter
-          image: bitnami/jmx-exporter:0.19.0
+          image: bitnami/jmx-exporter:0.20.0
+          command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jmx_prometheus_httpserver.jar"]
           args: ["5556", "/jmx-exporter-config/config.yaml"]
           ports:
             - containerPort: 5556
+          livenessProbe:
+            tcpSocket:
+              port: 5556
+            initialDelaySeconds: 15
+            timeoutSeconds: 100
+            periodSeconds: 300
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5556
+            initialDelaySeconds: 30
+            # it has been reported that in cases with many topics to synchronize, it takes a long time for the first request.
+            timeoutSeconds: 300
+            periodSeconds: 300
           resources:
             requests:
               cpu: 100m
               memory: 100Mi
             limits:
               cpu: 2
-              memory: 1Gi
+              memory: 1.5Gi
           volumeMounts:
             - mountPath: /jmx-exporter-config
               name: jmx-exporter-config
