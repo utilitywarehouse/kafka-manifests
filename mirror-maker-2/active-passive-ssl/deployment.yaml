@@ -97,7 +97,7 @@ spec:
               cpu: 400m
               memory: 1Gi
             limits:
-              cpu: "2"
+              cpu: "6"
               memory: 5Gi
           volumeMounts:
             - name: mm2-config
@@ -113,7 +113,8 @@ spec:
             tcpSocket:
               port: 5556
             initialDelaySeconds: 15
-            timeoutSeconds: 10
+            timeoutSeconds: 100
+            periodSeconds: 300
           readinessProbe:
             httpGet:
               path: /
@@ -121,6 +122,7 @@ spec:
             initialDelaySeconds: 30
             # it has been reported that in cases with many topics to synchronize, it takes a long time for the first request.
             timeoutSeconds: 300
+            periodSeconds: 300
           resources:
             requests:
               cpu: 100m
