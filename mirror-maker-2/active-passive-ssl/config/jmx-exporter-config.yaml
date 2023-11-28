@@ -48,16 +48,6 @@ rules:
     cache: true
     type: GAUGE
 
-#  #kafka.connect:type=connect-node-metrics,client-id="{clientid}",node-id="{nodeid}"
-#  #kafka.consumer:type=consumer-node-metrics,client-id=consumer-1,node-id="{nodeid}"
-#  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), node-id=(.+)><>(.+-total|.+-avg)
-#    name: kafka_$2_$5
-#    labels:
-#      clientId: "$3"
-#      nodeId: "$4"
-#    help: "Kafka $1 JMX metric type $2"
-#    type: UNTYPED
-
   #kafka.connect:type=kafka-metrics-count,client-id="{clientid}"
   #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}"
   #kafka.consumer:type=consumer-coordinator-metrics,client-id="{clientid}"
@@ -80,13 +70,14 @@ rules:
       task: "$2"
       status: "$3"
     help: "Kafka Connect JMX Connector status"
+    cache: true
     type: GAUGE
 
   #kafka.connect:type=task-error-metrics,connector="{connector}",task="{task}"
   #kafka.connect:type=source-task-metrics,connector="{connector}",task="{task}"
   #kafka.connect:type=sink-task-metrics,connector="{connector}",task="{task}"
   #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}"
-  - pattern: kafka.connect<type=(.+)-metrics, connector=(.+), task=(.+)><>(.+-total|.+-count|.+-ms|.+-ratio|.+-avg|.+-failures|.+-requests|.+-timestamp|.+-logged|.+-errors|.+-retries|.+-skipped)
+  - pattern: kafka.connect<type=(.+)-metrics, connector=(.+), task=(.+)><>(.+-total|.+-count|.+-failures|.+-requests|.+-timestamp|.+-logged|.+-errors|.+-retries|.+-skipped)
     name: kafka_connect_$1_$4
     labels:
       connector: "$2"
@@ -102,18 +93,21 @@ rules:
     labels:
       connector: "$1"
     help: "Kafka Connect JMX metric $1"
+    cache: true
     type: GAUGE
 
   #kafka.connect:type=connect-worker-metrics
   - pattern: kafka.connect<type=connect-worker-metrics><>([a-z-]+)
     name: kafka_connect_worker_$1
     help: "Kafka Connect JMX metric worker"
+    cache: true
     type: GAUGE
 
   #kafka.connect:type=connect-worker-rebalance-metrics
   - pattern: kafka.connect<type=connect-worker-rebalance-metrics><>([a-z-]+)
     name: kafka_connect_worker_rebalance_$1
     help: "Kafka Connect JMX metric rebalance information"
+    cache: true
     type: GAUGE
 
   #kafka.connect:type=MirrorSourceConnector
@@ -124,6 +118,7 @@ rules:
       topic: "$2"
       partition: "$3"
     help: "Kafka Mirror Maker 2 Source Connector metrics"
+    cache: true
     type: GAUGE
 
   #kafka.connect:type=MirrorCheckpointConnector
@@ -136,4 +131,5 @@ rules:
       topic: "$4"
       partition: "$5"
     help: "Kafka Mirror Maker 2 Checkpoint Connector metrics"
+    cache: true
     type: GAUGE
