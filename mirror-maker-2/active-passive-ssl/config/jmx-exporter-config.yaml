@@ -63,7 +63,7 @@ rules:
   #kafka.consumer:type=consumer-coordinator-metrics,client-id="{clientid}"
   #kafka.consumer:type=consumer-metrics,client-id="{clientid}"
   #kafka.consumer:type=producer-metrics,client-id="{clientid}"
-  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.*)><>(.*record-.+|.*error.+|.*outgoing-.+|.*incoming-.+|.*buffer-.+)
+  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.*)><>(.*record-[^:]*|.*error[^:]*|.*outgoing-[^:]*|.*incoming-[^:]*|.*buffer-[^:]*)
     name: kafka_$2_$4
     labels:
       clientId: "$3"
