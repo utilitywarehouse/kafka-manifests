@@ -20,6 +20,17 @@ spec:
         prometheus.io/scrape: "true"
     spec:
       terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: copy-jmx-exporter-jar
+          image: bitnami/jmx-exporter:0.20.0
+          command:
+            - cp
+            - /opt/bitnami/jmx-exporter/jmx_prometheus_javaagent.jar
+            - /jmx-exporter-jar/jmx_prometheus_javaagent.jar
+
+          volumeMounts:
+            - name: jmx-exporter-jar
+              mountPath: /jmx-exporter-jar
       containers:
         - name: *app
           imagePullPolicy: IfNotPresent
@@ -31,9 +42,13 @@ spec:
               value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
             - name: JMX_PORT
               value: "5555"
+            - name: KAFKA_OPTS
+              value: "-javaagent:/jmx-exporter-jar/jmx_prometheus_javaagent.jar=5556:/jmx-exporter-config/config.yaml"
           command:
             - /opt/bitnami/kafka/bin/connect-mirror-maker.sh
             - /config/connect-mirror-maker.properties
+          ports:
+            - containerPort: 5556
           resources:
             requests:
               cpu: 400m
@@ -41,17 +56,6 @@ spec:
             limits:
               cpu: "6"
               memory: 5Gi
-          volumeMounts:
-            - name: mm2-config
-              mountPath: /config
-            - name: log4j-config
-              mountPath: /log4j-config
-        - name: jmx-exporter
-          image: bitnami/jmx-exporter:0.20.0
-          command: ["java", "-Xms256m", "-Xmx1024m", "-jar", "jmx_prometheus_httpserver.jar"]
-          args: ["5556", "/jmx-exporter-config/config.yaml"]
-          ports:
-            - containerPort: 5556
           livenessProbe:
             tcpSocket:
               port: 5556
@@ -66,20 +70,22 @@ spec:
             # it has been reported that in cases with many topics to synchronize, it takes a long time for the first request.
             timeoutSeconds: 300
             periodSeconds: 300
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
-            limits:
-              cpu: 2
-              memory: 1.5Gi
           volumeMounts:
+            - name: mm2-config
+              mountPath: /config
+            - name: log4j-config
+              mountPath: /log4j-config
+            - name: jmx-exporter-jar
+              mountPath: /jmx-exporter-jar
             - mountPath: /jmx-exporter-config
               name: jmx-exporter-config
+
       volumes:
         - name: mm2-config
           configMap:
             name: mm2-config
+        - name: jmx-exporter-jar
+          emptyDir: {}
         - name: log4j-config
           configMap:
             name: mm2-log4j-config
