@@ -1,0 +1,7 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-shared-exporter
+  namespace: pubsub
+  annotations:
+    secret.reloader.stakater.com/reload: "kafka-exporter-cert"

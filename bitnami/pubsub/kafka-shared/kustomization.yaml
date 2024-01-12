@@ -8,3 +8,5 @@ resources:
 
 patches:
   - path: kafka-shared-admins.yaml
+  - path: refresh-broker-certs.yaml
+  - path: refresh-exporter-certs.yaml
