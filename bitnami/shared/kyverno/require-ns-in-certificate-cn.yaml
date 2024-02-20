@@ -23,6 +23,9 @@ spec:
           - key: "{{ request.object.spec.issuerRef.name || '' }}"
             operator: Equals
             value: kafka-shared-selfsigned-issuer
+          - key: "{{ request.object.spec.issuerRef.name || '' }}"
+            operator: Equals
+            value: aws-pca  
       validate:
         message: "CN must be prefixed with the namespace"
         pattern:
