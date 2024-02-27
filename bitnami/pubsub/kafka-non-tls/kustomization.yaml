@@ -4,3 +4,34 @@ kind: Kustomization
 resources:
   - upstream
   - ../../shared/logging
+
+components:
+  - ../../../shared/opslevel
+
+patches:
+  - target:
+      version: v1
+      group: apps
+      kind: Deployment
+      name: kafka-non-tls-exporter
+      namespace: pubsub
+    patch: |-
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1description
+        value: Metrics exporter for the non-TLS Kafka cluster
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1tier
+        value: tier_3
+  - target:
+      version: v1
+      group: apps
+      kind: StatefulSet
+      name: kafka-non-tls
+      namespace: pubsub
+    patch: |-
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1description
+        value: Kafka instance for the non-TLS Kafka cluster
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1tier
+        value: tier_1

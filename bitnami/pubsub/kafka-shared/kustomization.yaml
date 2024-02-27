@@ -6,7 +6,36 @@ resources:
   - ../../shared/logging
   - certs.yaml
 
+components:
+  - ../../../shared/opslevel
+
 patches:
   - path: kafka-shared-admins.yaml
   - path: refresh-broker-certs.yaml
   - path: refresh-exporter-certs.yaml
+  - target:
+      version: v1
+      group: apps
+      kind: Deployment
+      name: kafka-shared-exporter
+      namespace: pubsub
+    patch: |-
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1description
+        value: Metrics exporter for shared Kafka
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1tier
+        value: tier_3
+  - target:
+      version: v1
+      group: apps
+      kind: StatefulSet
+      name: kafka-shared
+      namespace: pubsub
+    patch: |-
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1description
+        value: Kafka instance for the shared cluster
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1tier
+        value: tier_1
