@@ -5,6 +5,23 @@ kind: Kustomization
 resources:
   - deployment.yaml
 
+components:
+  - ../../shared/opslevel
+
+patches:
+  - target:
+      version: v1
+      group: apps
+      kind: Deployment
+      name: mm2
+    patch: |-
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1description
+        value: Mirror maker with flexible setup
+      - op: add
+        path: /metadata/annotations/app.uw.systems~1tier
+        value: tier_4
+
 configMapGenerator:
   - name: mm2-config-template
     files:
