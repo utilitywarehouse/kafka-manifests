@@ -1,3 +1,5 @@
+# Bitnami based manifests
+
 Creates a base from bitnami helm charts with minimal configuration
 
 `shared` contains kustomize bases that can be reused across namespaces
@@ -45,3 +47,22 @@ pubsub
 * add more resources to be base if needed
 * PR the changes
 * use the new base in `kubernetes-manifests`
+
+## Monitoring
+
+For clusters using these manfiests, there are Grafana dashboards available for:
+
+  - A general overview:
+      - [`dev-aws`](https://grafana.dev.aws.uw.systems/d/qoF35R8Vk/bitnami-kafka-overview?from=now-24h&to=now&var-datasource=default&var-namespace=pubsub&var-topic=All&var-consumergroup=All&orgId=1&refresh=1m)
+      - [`dev-gcp`](https://grafana.dev.gcp.uw.systems/d/qoF35R8Vk/bitnami-kafka-overview?from=now-24h&to=now&var-datasource=default&var-namespace=pubsub&var-topic=All&var-consumergroup=All&orgId=1&refresh=1m)
+      - [`dev-merit`](https://grafana.dev.merit.uw.systems/d/qoF35R8Vk/bitnami-kafka-overview?from=now-24h&to=now&var-datasource=default&var-namespace=pubsub&var-topic=All&var-consumergroup=All&orgId=1&refresh=1m)
+      - [`prod-aws`](https://grafana.prod.aws.uw.systems/d/qoF35R8Vk/bitnami-kafka-overview?from=now-24h&to=now&var-datasource=default&var-namespace=pubsub&var-topic=All&var-consumergroup=All&orgId=1&refresh=1m)
+      - [`prod-gcp`](https://grafana.prod.gcp.uw.systems/d/qoF35R8Vk/bitnami-kafka-overview?from=now-24h&to=now&var-datasource=default&var-namespace=pubsub&var-topic=All&var-consumergroup=All&orgId=1&refresh=1m)
+      - [`prod-merit`](https://grafana.prod.merit.uw.systems/d/qoF35R8Vk/bitnami-kafka-overview?from=now-24h&to=now&var-datasource=default&var-namespace=pubsub&var-topic=All&var-consumergroup=All&orgId=1&refresh=1m)
+  - Topic and consumer group stats
+      - [`dev-aws`](https://grafana.dev.aws.uw.systems/d/54voygUVz/bitnami-kafka-topics-and-consumer-group-stats?orgId=1&refresh=1m&var-datasource=default&var-namespace=pubsub&var-topic=All)
+      - [`dev-gcp`](https://grafana.dev.gcp.uw.systems/d/54voygUVz/bitnami-kafka-topics-and-consumer-group-stats?orgId=1&refresh=1m&var-datasource=default&var-namespace=pubsub&var-topic=All)
+      - [`dev-merit`](https://grafana.dev.merit.uw.systems/d/54voygUVz/bitnami-kafka-topics-and-consumer-group-stats?orgId=1&refresh=1m&var-datasource=default&var-namespace=pubsub&var-topic=All)
+      - [`prod-aws`](https://grafana.prod.aws.uw.systems/d/54voygUVz/bitnami-kafka-topics-and-consumer-group-stats?orgId=1&refresh=1m&var-datasource=default&var-namespace=pubsub&var-topic=All)
+      - [`prod-gcp`](https://grafana.prod.gcp.uw.systems/d/54voygUVz/bitnami-kafka-topics-and-consumer-group-stats?orgId=1&refresh=1m&var-datasource=default&var-namespace=pubsub&var-topic=All)
+      - [`prod-merit`](https://grafana.prod.merit.uw.systems/d/54voygUVz/bitnami-kafka-topics-and-consumer-group-stats?orgId=1&refresh=1m&var-datasource=default&var-namespace=pubsub&var-topic=All)
