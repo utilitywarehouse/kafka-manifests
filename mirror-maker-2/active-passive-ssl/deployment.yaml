@@ -69,7 +69,7 @@ spec:
             # When target has SSL enabled, mirror maker uses JKS keystore and truststore encrypted by password to connect. Use properties below
             - name: TARGET_SSL_ENABLE
               value: "false"
-            # Whether the truststore for the source needs to be specified. For MSK sources this must be "false" and for hosted bitnami sources it must be "true". By default, it is set to "true".
+            # Whether the truststore for the target needs to be specified. For MSK sources this must be "false" and for hosted bitnami sources it must be "true". By default, it is set to "true".
             - name: TARGET_TRUSTSTORE_REQUIRED
               value: "true"
             # The location to the JKS truststore
