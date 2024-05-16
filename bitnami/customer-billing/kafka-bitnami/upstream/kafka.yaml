@@ -281,6 +281,11 @@ metadata:
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: cluster-metrics
+  annotations:
+    "app.uw.systems/description": "kafka-bitnami-exporter"
+    "app.uw.systems/tier": "tier_2"
+    "app.uw.systems/repos.kafka-manifests": "https://github.com/utilitywarehouse/kafka-manifests/tree/master/bitnami/customer-billing/kafka-bitnami/upstream"
+    "app.uw.systems/system": "billing_experience_kafka_bitnami"
 spec:
   replicas: 1
   selector:
