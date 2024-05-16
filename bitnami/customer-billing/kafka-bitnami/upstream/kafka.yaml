@@ -572,6 +572,9 @@ spec:
             - name: jmx-config
               mountPath: /etc/jmx-kafka
       volumes:
+        - name: exporter
+          configMap:
+            name: kafka-bitnami-exporter
         - name: log4j-config
           configMap:
             name: kafka-log4j-config
