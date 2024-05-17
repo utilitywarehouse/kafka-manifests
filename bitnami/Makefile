@@ -19,6 +19,19 @@ gen-pubsub-kafka-shared:
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
 
+.PHONY: gen-otel-kafka
+gen-otel-kafka:
+	docker run -ti --rm \
+	  -v $${PWD}:/opt/manifests \
+	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
+	  -e NS="otel" \
+	  -e NAME="kafka-bitnami" \
+	  -e KRAFT_CLUSTERID="MTkwQzczMTJCRUI1NEQ0N0" \
+	  -e VALUES=${VALUES_TLS} \
+	  --workdir=/opt/manifests \
+	  --entrypoint=/bin/sh \
+	  alpine/helm ./gen-yaml/gen
+
 .PHONY: gen-pubsub-kafka-non-tls
 gen-pubsub-kafka-non-tls:
 	docker run -ti --rm \
