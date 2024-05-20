@@ -1,0 +1,77 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-bitnami-0-tls
+spec:
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: kafka-bitnami-0-tls
+  commonName: otel/kafka-bitnami-0.kafka-bitnami-headless
+  dnsNames:
+    - kafka-bitnami-0.kafka-bitnami-headless.otel
+    - kafka-bitnami-0.kafka-bitnami-headless.otel.svc
+    - kafka-bitnami-0.kafka-bitnami-headless.otel.svc.cluster.local
+    # for local debugging
+    - localhost
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-bitnami-1-tls
+spec:
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: kafka-bitnami-1-tls
+  commonName: otel/kafka-bitnami-1.kafka-bitnami-headless
+  dnsNames:
+    - kafka-bitnami-1.kafka-bitnami-headless.otel
+    - kafka-bitnami-1.kafka-bitnami-headless.otel.svc
+    - kafka-bitnami-1.kafka-bitnami-headless.otel.svc.cluster.local
+    # for local debugging
+    - localhost
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-bitnami-2-tls
+spec:
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: kafka-bitnami-2-tls
+  commonName: otel/kafka-bitnami-2.kafka-bitnami-headless
+  dnsNames:
+    - kafka-bitnami-2.kafka-bitnami-headless.otel
+    - kafka-bitnami-2.kafka-bitnami-headless.otel.svc
+    - kafka-bitnami-2.kafka-bitnami-headless.otel.svc.cluster.local
+    # for local debugging
+    - localhost
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-exporter
+spec:
+  commonName: otel/kafka-exporter
+  dnsNames:
+    - kafka-exporter.otel.svc
+    - kafka-exporter.otel.svc.cluster.local
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: kafka-exporter-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-bitnami-tf-applier
+spec:
+  commonName: otel/kafka-bitnami-tf-applier
+  dnsNames:
+    - kafka-bitnami-tf-applier.otel
+  issuerRef:
+    kind: ClusterIssuer
+    name: kafka-shared-selfsigned-issuer
+  secretName: kafka-bitnami-tf-applier

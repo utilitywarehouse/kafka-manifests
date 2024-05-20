@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-bitnami
+  namespace: otel
+  annotations:
+    "app.uw.systems/name": "Otel kafka"
+    "app.uw.systems/description": "Kafka instance for Otel stack"
+    "app.uw.systems/tier": tier_3
+    "app.uw.systems/repos.manifests": https://github.com/utilitywarehouse/kafka-manifests/bitnami/otel/kafka-bitnami"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-bitnami-exporter
+  namespace: "otel"
+  annotations:
+    "app.uw.systems/name": "Otel kafka metrics exporter"
+    "app.uw.systems/description": "Metrics exporter for the otel Kafka instance"
+    "app.uw.systems/tier": tier_4
+    "app.uw.systems/repos.manifests": https://github.com/utilitywarehouse/kafka-manifests/bitnami/otel/kafka-bitnami"
