@@ -1,0 +1,6 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-bitnami
+  annotations:
+    secret.reloader.stakater.com/reload: "kafka-bitnami-0-tls,kafka-bitnami-1-tls,kafka-bitnami-2-tls"

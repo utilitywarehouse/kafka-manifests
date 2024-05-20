@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-bitnami
+  namespace: otel
+spec:
+  template:
+    spec:
+      containers:
+        - name: kafka
+          env:
+            - name: KAFKA_CFG_SUPER_USERS
+              value: "User:CN=otel/kafka-bitnami-0.kafka-bitnami-headless;User:CN=otel/kafka-bitnami-1.kafka-bitnami-headless;User:CN=otel/kafka-bitnami-2.kafka-bitnami-headless;User:CN=otel/kafka-bitnami-tf-applier"
