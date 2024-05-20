@@ -11,5 +11,6 @@ components:
 
 patches:
   - path: admins.yaml
+  - path: opslevel.yaml
   - path: refresh-broker-certs.yaml
   - path: refresh-exporter-certs.yaml
