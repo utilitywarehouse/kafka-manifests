@@ -4,7 +4,8 @@ kind: Kustomization
 resources:
   - upstream
   - ../../shared/logging
-  - admins.yaml
-  - certs.yaml
-  - refresh-broker-certs.yaml
-  - refresh-exporter-certs.yaml
+patches:
+  - path: admins.yaml
+  - path: certs.yaml
+  - path: refresh-broker-certs.yaml
+  - path: refresh-exporter-certs.yaml
