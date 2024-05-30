@@ -1,7 +1,0 @@
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: kafka-shared
-  namespace: pubsub
-  annotations:
-    secret.reloader.stakater.com/reload: "kafka-shared-0-tls,kafka-shared-1-tls,kafka-shared-2-tls"
