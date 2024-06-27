@@ -4,3 +4,9 @@ kind: Kustomization
 resources:
   - upstream
   - ../../shared/logging
+
+components:
+  - ../../../shared/opslevel
+
+patches:
+  - path: opslevel.yaml
