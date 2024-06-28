@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &name kafka-bitnami
+  namespace: billing
+  annotations:
+    "app.uw.systems/name": "Billing Kafka"
+    "app.uw.systems/description": "Kafka instance for Billing stack"
+    "app.uw.systems/tier": tier_3
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/kafka-manifests/bitnami/billing/kafka-bitnami"
+spec:
+  template:
+    metadata:
+      labels:
+        app: *name
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &name kafka-bitnami-exporter
+  namespace: billing
+  annotations:
+    "app.uw.systems/name": "Billing Kafka metrics exporter"
+    "app.uw.systems/description": "Metrics exporter for the Billing Kafka instance"
+    "app.uw.systems/tier": tier_4
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/kafka-manifests/bitnami/billing/kafka-bitnami"
+spec:
+  template:
+    metadata:
+      labels:
+        app: *name

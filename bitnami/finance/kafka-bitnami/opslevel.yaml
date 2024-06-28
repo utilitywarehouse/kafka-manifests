@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &name kafka-bitnami
+  namespace: finance
+  annotations:
+    "app.uw.systems/name": "Finance Kafka"
+    "app.uw.systems/description": "Kafka instance for Finance stack"
+    "app.uw.systems/tier": tier_3
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/kafka-manifests/bitnami/finance/kafka-bitnami"
+spec:
+  template:
+    metadata:
+      labels:
+        app: *name
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &name kafka-bitnami-exporter
+  namespace: finance
+  annotations:
+    "app.uw.systems/name": "Finance Kafka metrics exporter"
+    "app.uw.systems/description": "Metrics exporter for the Finance Kafka instance"
+    "app.uw.systems/tier": tier_4
+    "app.uw.systems/repos.manifests": "https://github.com/utilitywarehouse/kafka-manifests/bitnami/finance/kafka-bitnami"
+spec:
+  template:
+    metadata:
+      labels:
+        app: *name
