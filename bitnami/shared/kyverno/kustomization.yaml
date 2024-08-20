@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - require-ns-in-certificate-cn.yaml
+  - kafka-client-policies.yaml
