@@ -1,0 +1,117 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: generate-kafka-certificate
+  annotations:
+    policies.kyverno.io/title: Create certificate for Kafka client
+    policies.kyverno.io/category: Sample
+    policies.kyverno.io/subject: Deployment, Statefulset
+    policies.kyverno.io/description: >-
+      This policy creates the kafka client certificate for the annotated targets.
+spec:
+  # Generate for existing targets
+  generateExisting: true
+  background: true
+  rules:
+    - name: generate-msk-certificate
+      match:
+        any:
+          - resources:
+              annotations:
+                uw.systems/msk-kafka-client: "*"
+              kinds:
+                - Deployment
+                - StatefulSet
+      generate:
+        # Delete certificate if the target is deleted
+        synchronize: true
+        # Keep the generated certificates if the policy is deleted
+        orphanDownstreamOnPolicyDelete: true
+        apiVersion: cert-manager.io/v1
+        kind: Certificate
+        name: "{{request.object.metadata.name}}-gen-kafka-cert"
+        namespace: "{{request.namespace}}"
+        data:
+          spec:
+            commonName: "{{request.namespace}}/{{request.object.metadata.annotations.\"uw.systems/msk-kafka-client\"}}"
+            duration: 168h0m0s # 7 days, renews 2/3 of the way through
+            issuerRef:
+              group: awspca.cert-manager.io
+              kind: AWSPCAClusterIssuer
+              name: aws-pca
+            secretName: "{{request.object.metadata.name}}-gen-kafka-cert"
+    - name: generate-uw-hosted-certificate
+      match:
+        any:
+          - resources:
+              annotations:
+                uw.systems/uw-hosted-kafka-client: "*"
+              kinds:
+                - Deployment
+                - StatefulSet
+      generate:
+        # Delete certificate if the target is deleted
+        synchronize: true
+        # Keep the generated certificates if the policy is deleted
+        orphanDownstreamOnPolicyDelete: true
+        apiVersion: cert-manager.io/v1
+        kind: Certificate
+        name: "{{request.object.metadata.name}}-gen-kafka-cert"
+        namespace: "{{request.namespace}}"
+        data:
+          spec:
+            commonName: "{{request.namespace}}/{{request.object.metadata.annotations.\"uw.systems/uw-hosted-kafka-client\"}}"
+            duration: 168h0m0s # 7 days, renews 2/3 of the way through
+            issuerRef:
+              kind: ClusterIssuer
+              name: kafka-shared-selfsigned-issuer
+            secretName: "{{request.object.metadata.name}}-gen-kafka-cert"
+---
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mount-kafka-certificate-volume
+  annotations:
+    policies.kyverno.io/title: Add Certificates as a Volume
+    policies.kyverno.io/category: Sample
+    policies.kyverno.io/subject: Deployment,Volume
+    policies.kyverno.io/description: >-
+      This policy mounts the TLS artifacts from a certificate in all the containers of the annotated subjects.
+spec:
+  background: false
+  rules:
+    - name: add-ssl-certs
+      match:
+        any:
+          - resources:
+              annotations:
+                # this will match all annotations for kafka client certificate
+                uw.systems/*-kafka-client: "*"
+              kinds:
+                - Deployment
+                - StatefulSet
+              operations:
+                - CREATE
+                - UPDATE
+      mutate:
+        # mount the certificates volume on all containers in the pod, as we don't know which is the "app" one.
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            patchStrategicMerge:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: "{{ element.name }}"
+                        env:
+                          - name: UW_KAFKA_TLS_AUTH
+                            value: "true"
+                        volumeMounts:
+                        - name: kafka-client-cert
+                          mountPath: /certs
+                          readOnly: true
+                    volumes:
+                      - name: kafka-client-cert
+                        secret:
+                          secretName: "{{request.object.metadata.name}}-gen-kafka-cert"
