@@ -13,7 +13,8 @@ spec:
   generateExisting: true
   background: true
   rules:
-    - name: generate-msk-certificate
+    # using separate rule for each annotation, as the issuer, cert name and secret name are different for the generated Certificates
+    - name: generate-msk-kafka-certificate
       match:
         any:
           - resources:
@@ -29,7 +30,7 @@ spec:
         orphanDownstreamOnPolicyDelete: true
         apiVersion: cert-manager.io/v1
         kind: Certificate
-        name: "{{request.object.metadata.name}}-gen-kafka-cert"
+        name: "{{request.object.metadata.name}}-gen-msk-kafka-cert"
         namespace: "{{request.namespace}}"
         data:
           spec:
@@ -39,8 +40,8 @@ spec:
               group: awspca.cert-manager.io
               kind: AWSPCAClusterIssuer
               name: aws-pca
-            secretName: "{{request.object.metadata.name}}-gen-kafka-cert"
-    - name: generate-uw-hosted-certificate
+            secretName: "{{request.object.metadata.name}}-gen-msk-kafka-cert"
+    - name: generate-uw-hosted-kafka-certificate
       match:
         any:
           - resources:
@@ -56,7 +57,7 @@ spec:
         orphanDownstreamOnPolicyDelete: true
         apiVersion: cert-manager.io/v1
         kind: Certificate
-        name: "{{request.object.metadata.name}}-gen-kafka-cert"
+        name: "{{request.object.metadata.name}}-gen-uw-kafka-cert"
         namespace: "{{request.namespace}}"
         data:
           spec:
@@ -65,7 +66,7 @@ spec:
             issuerRef:
               kind: ClusterIssuer
               name: kafka-shared-selfsigned-issuer
-            secretName: "{{request.object.metadata.name}}-gen-kafka-cert"
+            secretName: "{{request.object.metadata.name}}-gen-uw-kafka-cert"
 ---
 
 apiVersion: kyverno.io/v1
@@ -81,13 +82,13 @@ metadata:
 spec:
   background: false
   rules:
-    - name: add-ssl-certs
+    # using separate rule for each annotation, as the name of the generated secret differs
+    - name: add-msk-kafka-ssl-certs
       match:
         any:
           - resources:
               annotations:
-                # this will match all annotations for kafka client certificate
-                uw.systems/*-kafka-client: "*"
+                uw.systems/msk-kafka-client: "*"
               kinds:
                 - Deployment
                 - StatefulSet
@@ -108,10 +109,43 @@ spec:
                           - name: UW_KAFKA_TLS_AUTH
                             value: "true"
                         volumeMounts:
-                        - name: kafka-client-cert
-                          mountPath: /certs
-                          readOnly: true
+                          - name: kafka-client-cert
+                            mountPath: /certs
+                            readOnly: true
                     volumes:
                       - name: kafka-client-cert
                         secret:
-                          secretName: "{{request.object.metadata.name}}-gen-kafka-cert"
+                          secretName: "{{request.object.metadata.name}}-gen-msk-kafka-cert"
+    - name: add-uw-hosted-kafka-ssl-certs
+      match:
+        any:
+          - resources:
+              annotations:
+                uw.systems/uw-hosted-kafka-client: "*"
+              kinds:
+                - Deployment
+                - StatefulSet
+              operations:
+                - CREATE
+                - UPDATE
+      mutate:
+        # mount the certificates volume on all containers in the pod, as we don't know which is the "app" one.
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            patchStrategicMerge:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: "{{ element.name }}"
+                        env:
+                          - name: UW_KAFKA_TLS_AUTH
+                            value: "true"
+                        volumeMounts:
+                          - name: kafka-client-cert
+                            mountPath: /certs
+                            readOnly: true
+                    volumes:
+                      - name: kafka-client-cert
+                        secret:
+                          secretName: "{{request.object.metadata.name}}-gen-uw-kafka-cert"
