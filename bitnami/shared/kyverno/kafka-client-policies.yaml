@@ -35,7 +35,8 @@ spec:
         data:
           spec:
             commonName: "{{request.namespace}}/{{request.object.metadata.annotations.\"uw.systems/msk-kafka-client\"}}"
-            duration: 168h0m0s # 7 days, renews 2/3 of the way through
+            duration: 168h0m0s # 7 days validity
+            renewBefore: 96h0m0s # renews 4d before expiry to give us room to act if renewal fails.
             issuerRef:
               group: awspca.cert-manager.io
               kind: AWSPCAClusterIssuer
@@ -62,7 +63,8 @@ spec:
         data:
           spec:
             commonName: "{{request.namespace}}/{{request.object.metadata.annotations.\"uw.systems/uw-hosted-kafka-client\"}}"
-            duration: 168h0m0s # 7 days, renews 2/3 of the way through
+            duration: 168h0m0s # 7 days validity
+            renewBefore: 96h0m0s # renews 4d before expiry to give us room to act if renewal fails.
             issuerRef:
               kind: ClusterIssuer
               name: kafka-shared-selfsigned-issuer
