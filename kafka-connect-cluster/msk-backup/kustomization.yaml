@@ -1,14 +1,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namePrefix: "msk-backup-"
+
 resources:
-  - kafka-cert.yaml
-  - statefulset.yaml
+  - ../generic-base
 
-
+patches:
+  - path: kafka-cert.yaml
+  - path: statefulset.yaml
 # Example on how to create the secret holding the jks data.
 #secretGenerator:
-#  - name: kafka-connect-jks-data
+#  - name: msk-backup-kafka-connect-jks-data
 #    envs:
 #      - ./secrets/jks.properties
 #    options:
