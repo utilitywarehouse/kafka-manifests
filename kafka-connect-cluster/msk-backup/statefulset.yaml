@@ -30,7 +30,7 @@ spec:
             - name: CONNECT_REST_ADVERTISED_HOST_NAME
               value: "$(POD_NAME).msk-backup-kafka-connect-cluster.pubsub.svc.cluster.local"
             - name: CONNECT_GROUP_ID
-              value: "msk-backup-kafka-connect"
+              value: "pubsub.msk-backup-kafka-connect-worker-group"
             - name: CONNECT_CONFIG_STORAGE_TOPIC
               value: "pubsub.msk-backup.connect-configs"
             - name: CONNECT_OFFSET_STORAGE_TOPIC
