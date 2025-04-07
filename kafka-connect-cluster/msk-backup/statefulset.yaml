@@ -22,7 +22,7 @@ spec:
               value: "TBD"
 
             - name: CONNECT_PLUGIN_PATH
-              value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/uwconnectors"
+              value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/uw-connectors"
             - name: POD_NAME
               valueFrom:
                 fieldRef:
