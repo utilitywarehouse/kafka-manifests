@@ -5,6 +5,7 @@ namePrefix: "msk-backup-"
 
 resources:
   - ../generic-base
+  - sa.yaml
 
 patches:
   - path: kafka-cert.yaml

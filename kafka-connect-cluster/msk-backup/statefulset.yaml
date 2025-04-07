@@ -10,7 +10,11 @@ metadata:
     secret.reloader.stakater.com/reload: "msk-backup-kafka-connect-cert"
 spec:
   template:
+    metadata:
+      annotations:
+        uw.systems/kyverno-inject-sidecar-request: vault-sidecar-aws
     spec:
+      serviceAccountName: bucket-access
       containers:
         - name: *app
           env:
