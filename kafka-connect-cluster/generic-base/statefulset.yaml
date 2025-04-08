@@ -40,8 +40,6 @@ spec:
         app.kubernetes.io/name: *app
     spec:
       terminationGracePeriodSeconds: 30
-      imagePullSecrets:
-        - name: dockerhub-key
       containers:
         - name: *app
           imagePullPolicy: Always
