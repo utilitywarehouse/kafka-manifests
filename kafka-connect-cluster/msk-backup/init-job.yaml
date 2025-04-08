@@ -14,7 +14,9 @@ spec:
           args:
             - /bin/sh
             - -c
-            - /scripts/register_connectors.sh
+            - |
+              apk add --no-cache curl jq
+              /scripts/register_connectors.sh
           env:
             - name: KAFKA_CONNECT_API_HOST
               value: "http://msk-backup-kafka-connect-cluster-0.msk-backup-kafka-connect-cluster.pubsub.svc.cluster.local:8083"
