@@ -22,7 +22,7 @@ spec:
               value: "TBD"
 
             - name: CONNECT_PLUGIN_PATH
-              value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/uw-connectors"
+              value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/extra-connectors"
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -76,15 +76,15 @@ spec:
               apk add --no-cache curl unzip
               curl -sSL https://github.com/lensesio/stream-reactor/releases/download/${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}.zip -o /tmp/kafka-connect-aws-s3.zip
               unzip -d /tmp /tmp/kafka-connect-aws-s3.zip
-              cp /tmp/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-assembly-${LENSES_IO_CONNECTOR_VERSION}.jar /usr/share/uw-connectors
+              cp /tmp/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-assembly-${LENSES_IO_CONNECTOR_VERSION}.jar /usr/share/extra-connectors
           env:
             - name: LENSES_IO_CONNECTOR_VERSION
               value: 8.1.31
           volumeMounts:
-            - name: uw-connectors
-              mountPath: /usr/share/uw-connectors
+            - name: extra-connectors
+              mountPath: /usr/share/extra-connectors
       volumes:
-        - name: uw-connectors
+        - name: extra-connectors
           emptyDir: {}
         - name: kafka-certificates
           secret:

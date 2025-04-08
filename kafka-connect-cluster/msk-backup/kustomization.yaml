@@ -6,10 +6,20 @@ namePrefix: "msk-backup-"
 resources:
   - ../generic-base
   - sa.yaml
+  - init-job.yaml
 
 patches:
   - path: kafka-cert.yaml
   - path: statefulset.yaml
+
+configMapGenerator:
+  - name: scripts
+    files:
+      - register_connectors.sh=scripts/register_connectors.sh
+  - name: connector-payloads
+    files:
+      - backup-connector.json=connector-payloads/backup-connector.json
+
 # Example on how to create the secret holding the jks data.
 #secretGenerator:
 #  - name: msk-backup-kafka-connect-jks-data
@@ -17,3 +27,4 @@ patches:
 #      - ./secrets/jks.properties
 #    options:
 #      disableNameSuffixHash: true
+
