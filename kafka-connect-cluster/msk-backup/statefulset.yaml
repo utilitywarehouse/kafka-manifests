@@ -66,6 +66,8 @@ spec:
             - name: kafka-certificates
               mountPath: /etc/kafka-connect/certs
               readOnly: true
+            - name: extra-connectors
+              mountPath: /usr/share/extra-connectors
       initContainers:
         - name: download-connectors
           image: alpine
