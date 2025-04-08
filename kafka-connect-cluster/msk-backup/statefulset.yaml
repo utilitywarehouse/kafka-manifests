@@ -21,6 +21,9 @@ spec:
             - name: CONNECT_BOOTSTRAP_SERVERS
               value: "TBD"
 
+            # Update the heap options to match the maximum allocated
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx3G -Xms1G
             - name: CONNECT_PLUGIN_PATH
               value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/extra-connectors"
             - name: POD_NAME
