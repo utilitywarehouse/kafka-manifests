@@ -1,0 +1,23 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-connect
+spec:
+  commonName: TBD
+  keystores:
+    jks:
+      create: true
+      passwordSecretRef:
+        key: jks.password
+        name: TBD # the name of the secret that holds the data for jks
+  secretName: TBD # the name of the secret that will be loaded with tls assets
+
+  duration: 168h0m0s # 7 days validity, renews 4 days before expiration
+  renewBefore: 96h0m0s
+  # Assume connecting to MSK by default
+  issuerRef:
+    group: awspca.cert-manager.io
+    kind: AWSPCAClusterIssuer
+    name: aws-pca
+

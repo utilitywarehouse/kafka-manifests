@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &app kafka-connect-cluster
+  annotations:
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/tier": "tier_4"
+    "app.uw.systems/description": "MSK backup kafka Connect cluster"
+    # the name of the secret holding the TLS assets
+    secret.reloader.stakater.com/reload: "msk-backup-kafka-connect-cert"
+spec:
+  template:
+    metadata:
+      annotations:
+        uw.systems/kyverno-inject-sidecar-request: vault-sidecar-aws
+    spec:
+      serviceAccountName: bucket-access
+      containers:
+        - name: *app
+          env:
+            - name: CONNECT_BOOTSTRAP_SERVERS
+              value: "TBD"
+
+            # Update the heap options to match the maximum allocated
+            - name: KAFKA_HEAP_OPTS
+              value: -Xmx3G -Xms1G
+            - name: CONNECT_PLUGIN_PATH
+              value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/extra-connectors"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CONNECT_REST_ADVERTISED_HOST_NAME
+              value: "$(POD_NAME).msk-backup-kafka-connect-cluster.pubsub.svc.cluster.local"
+            - name: CONNECT_GROUP_ID
+              value: "pubsub.msk-backup-kafka-connect-worker-group"
+            - name: CONNECT_CONFIG_STORAGE_TOPIC
+              value: "pubsub.msk-backup.connect-configs"
+            - name: CONNECT_OFFSET_STORAGE_TOPIC
+              value: "pubsub.msk-backup.connect-offsets"
+            - name: CONNECT_STATUS_STORAGE_TOPIC
+              value: "pubsub.msk-backup.connect-status"
+            # Consumer-specific - doesn't inherit from top level
+            - name: CONNECT_CONSUMER_GROUP_ID
+              value: "pubsub.msk-backup-kafka-connect"
+            - name: CONNECT_CONSUMER_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # the name of the secret that holds the data for jks
+                  name: msk-backup-kafka-connect-jks-data
+                  key: jks.password
+            - name: CONNECT_PRODUCER_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # the name of the secret that holds the data for jks
+                  name: msk-backup-kafka-connect-jks-data
+                  key: jks.password
+            - name: CONNECT_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # the name of the secret that holds the data for jks
+                  name: msk-backup-kafka-connect-jks-data
+                  key: jks.password
+          resources:
+            limits:
+              cpu: 2
+              memory: 4Gi
+          volumeMounts:
+            - name: kafka-certificates
+              mountPath: /etc/kafka-connect/certs
+              readOnly: true
+            - name: extra-connectors
+              mountPath: /usr/share/extra-connectors
+      initContainers:
+        - name: download-connectors
+          image: alpine
+          args:
+            - /bin/sh
+            - -c
+            - |
+              apk add --no-cache curl unzip
+              curl -sSL https://github.com/lensesio/stream-reactor/releases/download/${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}.zip -o /tmp/kafka-connect-aws-s3.zip
+              unzip -d /tmp /tmp/kafka-connect-aws-s3.zip
+              cp /tmp/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-assembly-${LENSES_IO_CONNECTOR_VERSION}.jar /usr/share/extra-connectors
+          env:
+            - name: LENSES_IO_CONNECTOR_VERSION
+              value: 8.1.31
+          volumeMounts:
+            - name: extra-connectors
+              mountPath: /usr/share/extra-connectors
+      volumes:
+        - name: extra-connectors
+          emptyDir: {}
+        - name: kafka-certificates
+          secret:
+            # The name of the secret set in kafka-cert.yaml, holding the tls assets
+            secretName: msk-backup-kafka-connect-cert
+

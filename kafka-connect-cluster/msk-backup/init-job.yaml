@@ -1,0 +1,40 @@
+# Job that initializes the backup connector once the cluster is up.
+# Needs to be recreated if the task needs updated.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: connector-init
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-key
+      containers:
+        - name: connector-init
+          image: alpine
+          imagePullPolicy: Always
+          args:
+            - /bin/sh
+            - -c
+            - |
+              apk add --no-cache curl jq
+              /scripts/register_connectors.sh
+          env:
+            - name: KAFKA_CONNECT_API_HOST
+              value: "http://msk-backup-kafka-connect-cluster-0.msk-backup-kafka-connect-cluster.pubsub.svc.cluster.local:8083"
+            - name: CONNECTOR_CONFIG_DIR
+              value: "/connector-payloads"
+          volumeMounts:
+            - name: connector-payloads
+              mountPath: /connector-payloads
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: connector-payloads
+          configMap:
+            name: connector-payloads
+        - name: scripts
+          configMap:
+            name: scripts
+            defaultMode: 0777
+      restartPolicy: OnFailure
