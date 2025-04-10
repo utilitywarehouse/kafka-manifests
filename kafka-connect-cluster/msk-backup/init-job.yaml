@@ -4,6 +4,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: connector-init
+  annotations:
+    # Delete the job before creation so that Argo keeps it in sync only when the config map changes
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   template:
     spec:
