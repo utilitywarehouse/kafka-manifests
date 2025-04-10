@@ -4,6 +4,10 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: connector-init
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    # Delete the job before creation so that Argo keeps it in sync only when the config map changes
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   template:
     spec:
@@ -17,7 +21,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              apk add --no-cache curl jq
+              apk add --no-cache curl yq
               /scripts/register_connectors.sh
           env:
             - name: KAFKA_CONNECT_API_HOST

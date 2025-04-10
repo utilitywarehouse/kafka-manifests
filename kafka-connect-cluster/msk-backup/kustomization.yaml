@@ -18,7 +18,7 @@ configMapGenerator:
       - register_connectors.sh=scripts/register_connectors.sh
   - name: connector-payloads
     files:
-      - backup-connector.json=connector-payloads/backup-connector.json
+      - backup-connector.yaml=connector-payloads/backup-connector.yaml
 
 # Example on how to create the secret holding the jks data.
 #secretGenerator:
