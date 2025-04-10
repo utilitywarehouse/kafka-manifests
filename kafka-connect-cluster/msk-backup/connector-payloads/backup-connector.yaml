@@ -7,7 +7,7 @@ config:
   # include all topic, except:
   # - all topics created by mirror maker
   # - auth.iam-cerbos-audit-v1 currently this one can not be indexed due to an issue with the headers
-  topics.regex: ^(?!auth\.iam-cerbos-audit-v1$)(?!__amazon_msk_canary$)(?!.*heartbeats$)(?!.*\.checkpoints\.internal$)(?!mm2-).*"
+  topics.regex: ^(?!auth\.iam-cerbos-audit-v1$)(?!__amazon_msk_canary$)(?!.*heartbeats$)(?!.*\.checkpoints\.internal$)(?!mm2-).*
   key.converter.schemas.enable: 'false'
   connect.s3.kcql: >-
     insert into `uw-dev-pubsub-msk-backup:msk-backup-parquet` 
