@@ -9,6 +9,10 @@ config:
   # - auth.iam-cerbos-audit-v1 currently this one can not be indexed due to an issue with the headers
   topics.regex: ^(?!auth\.iam-cerbos-audit-v1$)(?!__amazon_msk_canary$)(?!.*heartbeats$)(?!.*\.checkpoints\.internal$)(?!mm2-).*
   key.converter.schemas.enable: 'false'
+  # consume from all topics, thus we need to specify the topic in the partitioning part.
+  # using the Parquet format, as this is the most performant both for backup and restoring
+  # 'store.envelope'=true - so that we can restore headers, timestamp, etc
+  # 'partition.include.keys'=false - so that we get a clean folder structure. Example of written file: msk-backup-parquet/pubsub.examples/2/pubsub.examples(2_000010811937).parquet
   connect.s3.kcql: >-
     insert into `uw-dev-pubsub-msk-backup:msk-backup-parquet` 
     select * from `*` 
