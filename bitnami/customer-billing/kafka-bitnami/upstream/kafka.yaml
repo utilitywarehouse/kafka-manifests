@@ -319,7 +319,7 @@ spec:
       serviceAccountName: kafka-bitnami-exporter
       containers:
         - name: kafka-exporter
-          image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r86
+          image: docker.io/bitnamilegacy/kafka-exporter:1.6.0-debian-11-r86
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsNonRoot: true
@@ -401,7 +401,7 @@ spec:
       serviceAccountName: kafka-bitnami
       containers:
         - name: kafka
-          image: docker.io/bitnami/kafka:3.4.0-debian-11-r28
+          image: docker.io/bitnamilegacy/kafka:3.4.0-debian-11-r28
           imagePullPolicy: "IfNotPresent"
           securityContext:
             allowPrivilegeEscalation: false
@@ -548,7 +548,7 @@ spec:
               mountPath: /scripts/setup.sh
               subPath: setup.sh
         - name: jmx-exporter
-          image: docker.io/bitnami/jmx-exporter:0.18.0-debian-11-r18
+          image: docker.io/bitnamilegacy/jmx-exporter:0.18.0-debian-11-r18
           imagePullPolicy: "IfNotPresent"
           securityContext:
             runAsNonRoot: true
