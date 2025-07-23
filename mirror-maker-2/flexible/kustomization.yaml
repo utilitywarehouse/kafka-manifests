@@ -35,7 +35,7 @@ configMapGenerator:
 #      - connect-mirror-maker.properties=config/connect-mirror-maker-sample.properties
 
 images:
-  - name: docker.io/bitnami/jmx-exporter
+  - name: bitnami/jmx-exporter
     newName: docker.io/bitnamilegacy/jmx-exporter
-  - name: docker.io/bitnami/kafka
+  - name: bitnami/kafka
     newName: docker.io/bitnamilegacy/kafka

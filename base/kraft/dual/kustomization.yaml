@@ -7,5 +7,5 @@ resources:
 
 
 images:
-  - name: docker.io/bitnami/jmx-exporter
+  - name: bitnami/jmx-exporter
     newName: docker.io/bitnamilegacy/jmx-exporter
