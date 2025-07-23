@@ -19,19 +19,6 @@ gen-otel-kafka:
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
 
-.PHONY: gen-energy-bitnami-kafka-non-tls
-gen-energy-kafka-non-tls:
-	docker run -ti --rm \
-	  -v $${PWD}:/opt/manifests \
-	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
-	  -e NS="energy" \
-	  -e NAME="kafka-bitnami" \
-	  -e KRAFT_CLUSTERID="NjY1Qjc2QTAwODU3NEE3Rk" \
-	  -e VALUES=${VALUES_NON_TLS} \
-	  --workdir=/opt/manifests \
-	  --entrypoint=/bin/sh \
-	  alpine/helm ./gen-yaml/gen
-
 .PHONY: gen-energy-platform-bitnami-kafka-non-tls
 gen-energy-platform-bitnami-kafka-non-tls:
 	docker run -ti --rm \
@@ -53,19 +40,6 @@ gen-finance-platform-bitnami-kafka-non-tls:
 	  -e NS="finance" \
 	  -e NAME="kafka-bitnami" \
 	  -e KRAFT_CLUSTERID="MzQ0MEVEQUUzRDg0NDdDNT" \
-	  -e VALUES=${VALUES_NON_TLS} \
-	  --workdir=/opt/manifests \
-	  --entrypoint=/bin/sh \
-	  alpine/helm ./gen-yaml/gen
-
-.PHONY: gen-billing-bitnami-kafka-non-tls
-gen-billing-platform-bitnami-kafka-non-tls:
-	docker run -ti --rm \
-	  -v $${PWD}:/opt/manifests \
-	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
-	  -e NS="billing" \
-	  -e NAME="kafka-bitnami" \
-	  -e KRAFT_CLUSTERID="RkU1NkQ2NkQwNTkxNDFEME" \
 	  -e VALUES=${VALUES_NON_TLS} \
 	  --workdir=/opt/manifests \
 	  --entrypoint=/bin/sh \
