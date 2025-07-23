@@ -19,19 +19,6 @@ gen-otel-kafka:
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
 
-.PHONY: gen-pubsub-kafka-non-tls
-gen-pubsub-kafka-non-tls:
-	docker run -ti --rm \
-	  -v $${PWD}:/opt/manifests \
-	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
-	  -e NS="pubsub" \
-	  -e NAME="kafka-non-tls" \
-	  -e KRAFT_CLUSTERID="MUE3RUU5Q0I5QzNCNEY1Mk" \
-	  -e VALUES=${VALUES_NON_TLS} \
-	  --workdir=/opt/manifests \
-	  --entrypoint=/bin/sh \
-	  alpine/helm ./gen-yaml/gen
-
 .PHONY: gen-energy-bitnami-kafka-non-tls
 gen-energy-kafka-non-tls:
 	docker run -ti --rm \
