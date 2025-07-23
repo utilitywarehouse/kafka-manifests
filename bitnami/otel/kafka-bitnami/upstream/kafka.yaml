@@ -343,7 +343,7 @@ spec:
       containers:
         - name: kafka-exporter
           image: docker.io/bitnami/kafka-exporter:1.6.0-debian-11-r86
-          imagePullPolicy: "IfNotPresent"
+          imagePullPolicy: "Always"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1001
