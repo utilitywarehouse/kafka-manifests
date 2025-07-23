@@ -84,7 +84,7 @@ spec:
             - name: mm2-config-template
               mountPath: /config-template
         - name: copy-jmx-exporter-jar
-          image: bitnami/jmx-exporter:0.20.0
+          image: bitnamilegacy/jmx-exporter:0.20.0
           command:
             - cp
             - /opt/bitnami/jmx-exporter/jmx_prometheus_javaagent.jar
@@ -96,7 +96,7 @@ spec:
       containers:
         - name: *app
           imagePullPolicy: IfNotPresent
-          image: bitnami/kafka:3.4
+          image: bitnamilegacy/kafka:3.4
           env:
             - name: KAFKA_HEAP_OPTS
               value: -Xmx4G -Xms1G
