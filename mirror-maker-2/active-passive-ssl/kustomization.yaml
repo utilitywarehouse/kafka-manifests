@@ -32,9 +32,3 @@ configMapGenerator:
   - name: mm2-jmx-exporter-config
     files:
       - config.yaml=config/jmx-exporter-config.yaml
-
-images:
-  - name: docker.io/bitnami/jmx-exporter
-    newName: docker.io/bitnamilegacy/jmx-exporter
-  - name: docker.io/bitnami/kafka
-    newName: docker.io/bitnamilegacy/kafka
