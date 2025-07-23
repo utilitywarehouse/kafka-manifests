@@ -5,3 +5,7 @@ resources:
   - brokers.yaml
   - brokers-configmap.yaml
   - lag-monitor.yaml
+
+images:
+  - name: docker.io/bitnami/jmx-exporter
+    newName: docker.io/bitnamilegacy/jmx-exporter
