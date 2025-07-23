@@ -4,3 +4,11 @@ resources:
   - brokers-configmap.yaml
   - lag-monitor.yaml
   - servers.yaml
+
+images:
+  - name: docker.io/bitnami/jmx-exporter
+    newName: docker.io/bitnamilegacy/jmx-exporter
+  - name: docker.io/bitnami/kafka
+    newName: docker.io/bitnamilegacy/kafka
+  - name: docker.io/bitnami/kafka-exporter
+    newName: quay.io/utilitywarehouse/kafka-exporter
