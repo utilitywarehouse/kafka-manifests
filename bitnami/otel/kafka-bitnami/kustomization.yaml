@@ -16,9 +16,9 @@ patches:
   - path: refresh-exporter-certs.yaml
 
 images:
-  - name: docker.io/bitnami/jmx-exporter
-    newName: docker.io/bitnamilegacy/jmx-exporter
-  - name: docker.io/bitnami/kafka
-    newName: docker.io/bitnamilegacy/kafka
+#  - name: docker.io/bitnami/jmx-exporter
+#    newName: docker.io/bitnamilegacy/jmx-exporter
+#  - name: docker.io/bitnami/kafka
+#    newName: docker.io/bitnamilegacy/kafka
   - name: docker.io/bitnami/kafka-exporter
     newName: quay.io/utilitywarehouse/kafka-exporter
