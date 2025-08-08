@@ -84,7 +84,7 @@ spec:
               cp /tmp/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-assembly-${LENSES_IO_CONNECTOR_VERSION}.jar /usr/share/extra-connectors
           env:
             - name: LENSES_IO_CONNECTOR_VERSION
-              value: 10.0.0
+              value: 9.0.0
           volumeMounts:
             - name: extra-connectors
               mountPath: /usr/share/extra-connectors
