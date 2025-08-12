@@ -23,7 +23,7 @@ spec:
 
             # Update the heap options to match the maximum allocated
             - name: KAFKA_HEAP_OPTS
-              value: -Xmx3G -Xms1G
+              value: -Xmx4G -Xms1G
             - name: CONNECT_PLUGIN_PATH
               value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/extra-connectors"
             - name: POD_NAME
@@ -62,9 +62,12 @@ spec:
                   name: msk-backup-kafka-connect-jks-data
                   key: jks.password
           resources:
+            requests:
+              cpu: 0
+              memory: 1Gi
             limits:
               cpu: 2
-              memory: 4Gi
+              memory: 5.5Gi
           volumeMounts:
             - name: kafka-certificates
               mountPath: /etc/kafka-connect/certs
