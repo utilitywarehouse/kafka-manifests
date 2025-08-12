@@ -98,4 +98,3 @@ spec:
           secret:
             # The name of the secret set in kafka-cert.yaml, holding the tls assets
             secretName: msk-backup-kafka-connect-cert
-
