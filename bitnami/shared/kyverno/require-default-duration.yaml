@@ -1,0 +1,30 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-default-duration
+  annotations:
+    policies.kyverno.io/title: Require certificate duration to be set to 7days
+    policies.kyverno.io/category: cert-manager
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Certificate
+    policies.kyverno.io/description: >-
+      certificate requests should set the duration to 7days
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-certificate-default-duration
+      match:
+        resources:
+          kinds:
+            - Certificate
+      preconditions:
+        any:
+          - key: "{{ request.object.spec.issuerRef.name || '' }}"
+            operator: Equals
+            value: kafka-shared-selfsigned-issuer
+      validate:
+        message: "Duration must be set to 168h (7 days) as per our recommended best practices"
+        pattern:
+          spec:
+            duration: "168h"
