@@ -35,7 +35,7 @@ spec:
       containers:
         - name: *app
           imagePullPolicy: Always
-          image: provectuslabs/kafka-ui:v0.7.1
+          image: provectuslabs/kafka-ui:v0.7.2
           env:
             # We need to list here all the config files loaded in the kafka-ui-config ConfigMap.
             # Although Spring Boot should support just setting the value to the folder "file:/kafka-ui-config/" as stated here: https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.files.optional-prefix,
