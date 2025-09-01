@@ -38,7 +38,7 @@ spec:
         app: *app
         app.kubernetes.io/name: *app
       annotations:
-        prometheus.io/path: /
+        prometheus.io/path: /metrics
         prometheus.io/port: "5556"
         prometheus.io/scrape: "true"
     spec:
