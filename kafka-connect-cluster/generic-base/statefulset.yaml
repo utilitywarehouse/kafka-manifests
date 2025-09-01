@@ -45,7 +45,7 @@ spec:
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: copy-jmx-exporter
-          image: quay.io/utilitywarehouse/docker-jmx-prometheus-javaagent-lib:v1.0.1-1
+          image: quay.io/utilitywarehouse/docker-jmx-prometheus-javaagent-lib:update-image
           command:
             - cp
             - /lib/jmx_prometheus_javaagent-1.0.1.jar
