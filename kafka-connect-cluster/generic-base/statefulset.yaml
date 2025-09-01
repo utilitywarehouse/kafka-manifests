@@ -45,6 +45,7 @@ spec:
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: copy-jmx-exporter
+          imagePullPolicy: Always
           image: quay.io/utilitywarehouse/docker-jmx-prometheus-javaagent-lib:update-image
           command:
             - cp
