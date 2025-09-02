@@ -3,6 +3,12 @@ kind: Kustomization
 
 namePrefix: "msk-backup-"
 
+# Overwrite the app labels from the base
+labels:
+  - pairs:
+      app.kubernetes.io/name: msk-backup-kafka-connect-cluster
+      app: msk-backup-kafka-connect-cluster
+
 resources:
   - ../generic-base
   - sa.yaml
@@ -19,7 +25,6 @@ configMapGenerator:
   - name: connector-payloads
     files:
       - backup-connector.yaml=connector-payloads/backup-connector.yaml
-
 # Example on how to create the secret holding the jks data.
 #secretGenerator:
 #  - name: msk-backup-kafka-connect-jks-data
