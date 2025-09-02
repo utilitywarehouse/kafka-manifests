@@ -1,127 +1,136 @@
 # See https://github.com/prometheus/jmx_exporter for more info about JMX Prometheus Exporter metrics
 
-lowercaseOutputName: true
+# Based on https://github.com/confluentinc/jmx-monitoring-stacks/blob/main/shared-assets/jmx-exporter/kafka_connect.yml
+---
+lowercaseOutputName: false
 lowercaseOutputLabelNames: true
+whitelistObjectNames:
+  # Engine Application Versioning Info
+  - kafka.connect:type=app-info,client-id=*
+  # Connect Worker Rebalancing info
+  - kafka.connect:type=connect-worker-rebalance-metrics
+  # Connect Co-ordinator Info
+  - kafka.connect:type=connect-coordinator-metrics,*
+  - kafka.connect:type=connect-metrics,*
+  # Worker level metrics for the aggregate as well as per connector level
+  - kafka.connect:type=connect-worker-metrics
+  - kafka.connect:type=connect-worker-metrics,*
+  # Engine Connector Versioning Info
+  - kafka.connect:type=connector-metrics,*
+  # Task level metrics for every connector running in the current node.
+  - kafka.connect:type=*-task-metrics,*
+  - kafka.connect:type=task-error-metrics,*
+  #  Confluent Replicator JMX Stats
+  #  - confluent.replicator:type=confluent-replicator-task-metrics,*
+  # The two lines below are used to pull the Kafka Client Producer & consumer metrics from Connect Workers.
+  # If you care about Producer/Consumer metrics for Connect, please uncomment 2 lines below.
+  # Please note that this increases the scrape duration by about 1-2 seconds as it needs to parse a lot of data.
+  - "kafka.consumer:*"
+  - "kafka.producer:*"
+blacklistObjectNames:
+  # This will ignore the admin client metrics from KSQL server and will blacklist certain metrics
+  # that do not make sense for ingestion.
+  - "kafka.admin.client:*"
+  - "kafka.consumer:type=*,id=*"
+  - "kafka.producer:type=*,id=*"
+  - "kafka.producer:client-id=confluent.monitoring*,*"
+  - "kafka.*:type=kafka-metrics-count,*"
+  # - "kafka.*:type=app-info,*"
 rules:
-  #kafka.connect:type=app-info,client-id="{clientid}"
-  #kafka.consumer:type=app-info,client-id="{clientid}"
-  #kafka.producer:type=app-info,client-id="{clientid}"
-  - pattern: "kafka.(.+)<type=app-info, client-id=(.+)><>start-time-ms"
-    name: kafka_$1_start_time_seconds
-    labels:
-      clientId: "$2"
-    help: "Kafka $1 JMX metric start time seconds"
-    type: GAUGE
-    valueFactor: 0.001
-    cache: true
-  - pattern: "kafka.(.+)<type=app-info, client-id=(.+)><>(commit-id|version): (.+)"
-    name: kafka_$1_$3_info
+  # "kafka.schema.registry:type=app-info,id=*"
+  - pattern: "kafka.connect<type=app-info, client-id=(.+)><>(.+): (.+)"
+    name: "kafka_connect_app_info"
     value: 1
     labels:
-      clientId: "$2"
-      $3: "$4"
-    help: "Kafka $1 JMX metric info version and commit-id"
-    cache: true
-    type: GAUGE
-
-  #kafka.producer:type=producer-topic-metrics,client-id="{clientid}",topic="{topic}"", partition="{partition}"
-  #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}",topic="{topic}"", partition="{partition}"
-  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), topic=(.+), partition=(.+)><>(.+-total|.+-lag)
-    name: kafka_$2_$6
+      client-id: "$1"
+      $2: "$3"
+    type: UNTYPED
+  # kafka.connect:type=connect-worker-rebalance-metrics
+  - pattern: "kafka.connect<type=connect-worker-rebalance-metrics><>([^:]+)"
+    name: "kafka_connect_connect_worker_rebalance_metrics_$1"
+  # kafka.connect:type=connect-coordinator-metrics,client-id=*
+  # kafka.connect:type=connect-metrics,client-id=*
+  - pattern: "kafka.connect<type=(.+), client-id=(.+)><>([^:]+)"
+    name: kafka_connect_$1_$3
     labels:
-      clientId: "$3"
-      topic: "$4"
-      partition: "$5"
-    help: "Kafka $1 JMX metric type $2"
-    cache: true
-    type: GAUGE
-
-  #kafka.producer:type=producer-topic-metrics,client-id="{clientid}",topic="{topic}"
-  #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}",topic="{topic}"
-  - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), topic=(.+)><>(.+-total)
-    name: kafka_$2_$5
+      client_id: $2
+  # kafka.connect:type=connect-worker-metrics
+  - pattern: "kafka.connect<type=connect-worker-metrics><>([^:]+)"
+    name: kafka_connect_connect_worker_metrics_$1
     labels:
-      clientId: "$3"
-      topic: "$4"
-    help: "Kafka $1 JMX metric type $2"
-    cache: true
-    type: GAUGE
-
-  #kafka.connect:type=kafka-metrics-count,client-id="{clientid}"
-  #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}"
-  #kafka.consumer:type=consumer-coordinator-metrics,client-id="{clientid}"
-  #kafka.consumer:type=consumer-metrics,client-id="{clientid}"
-  #kafka.consumer:type=producer-metrics,client-id="{clientid}"
-  - pattern: kafka.(.+)<type=(consumer-fetch-manager|consumer-coordinator|consumer|producer|producer-topic)-metrics, client-id=(.*)><>(.*record-send-total|.*error-total|outgoing-.+-total|incoming-.*-total|.*buffer-.*-total|.*buffer-.*-bytes)
-    name: kafka_$2_$4
+      connector: "aggregate"
+  # kafka.connect:type=connect-worker-metrics,connector=*
+  - pattern: "kafka.connect<type=connect-worker-metrics, connector=(.+)><>([^:]+)"
+    name: kafka_connect_connect_worker_metrics_$2
     labels:
-      clientId: "$3"
-    help: "Kafka $1 JMX metric type $2 by client-id"
-    cache: true
-    type: GAUGE
-
-  #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}<> status"
-  - pattern: "kafka.connect<type=connector-task-metrics, connector=(.+), task=(.+)><>status: ([a-z-]+)"
-    name: kafka_connect_connector_status
+      connector: $1
+  # kafka.connect:type=connector-metrics,connector=*
+  - pattern: "kafka.connect<type=connector-metrics, connector=(.+)><>(.+): (.+)"
     value: 1
+    name: kafka_connect_connector_metrics
     labels:
-      connector: "$1"
-      task: "$2"
-      status: "$3"
-    help: "Kafka Connect JMX Connector status"
-    cache: true
-    type: GAUGE
+      connector: $1
+      $2: $3
+    type: UNTYPED
 
-  #kafka.connect:type=task-error-metrics,connector="{connector}",task="{task}"
-  #kafka.connect:type=source-task-metrics,connector="{connector}",task="{task}"
-  #kafka.connect:type=sink-task-metrics,connector="{connector}",task="{task}"
-  #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}"
-  - pattern: kafka.connect<type=(.+)-metrics, connector=(.+), task=(.+)><>(.+-total|.+-count|.+-failures|.+-requests|.+-timestamp|.+-logged|.+-errors|.+-retries|.+-skipped|.+-avg-time-ms)
-    name: kafka_connect_$1_$4
+  # kafka.connect:type=*-task-metrics,*
+  # kafka.connect:type=source-task-metrics,connector=*,task=*
+  # kafka.connect:type=sink-task-metrics,connector=*,task=*
+  # kafka.connect:type=connector-task-metrics,connector=*,task=*
+  - pattern: "kafka.connect<type=(.+)-task-metrics, connector=(.+), task=(\\d+)><>(.+): (.+)"
+    name: kafka_connect_$1_task_metrics_$4
     labels:
       connector: "$2"
       task: "$3"
-    help: "Kafka Connect JMX metric type $1"
-    cache: true
-    type: GAUGE
-
-  #kafka.connect:type=connector-metrics,connector="{connector}"
-  #kafka.connect:type=connect-worker-metrics,connector="{connector}"
-  - pattern: kafka.connect<type=connect-worker-metrics, connector=(.+)><>([a-z-]+)
-    name: kafka_connect_worker_$2
+  # kafka.connect:type=task-error-metrics,*
+  # kafka.connect:type=task-error-metrics,connector=*,task=*
+  - pattern: "kafka.connect<type=task-error-metrics, connector=(.+), task=(\\d+)><>([^:]+)"
+    name: kafka_connect_task_error_metrics_$3
     labels:
       connector: "$1"
-    help: "Kafka Connect JMX metric $1"
-    cache: true
-    type: GAUGE
-
-  #kafka.connect:type=connect-worker-metrics
-  - pattern: kafka.connect<type=connect-worker-metrics><>(.+-count|.+-total|.+-ms)
-    name: kafka_connect_worker_$1
-    help: "Kafka Connect JMX metric worker"
-    cache: true
-    type: GAUGE
-
-  #kafka.connect:type=MirrorSourceConnector
-  - pattern: kafka.connect.mirror<type=MirrorSourceConnector, target=(.+), topic=(.+), partition=(.+)><>(.+-count|.+-total|.+-ms|.+-rate)
-    name: kafka_connect_mirror_mirrorsourceconnector_$4
+      task: "$2"
+  # "kafka.consumer:type=app-info,client-id=*"
+  # "kafka.producer:type=app-info,client-id=*"
+  - pattern: "kafka.(.+)<type=app-info, client-id=(.+)><>(.+): (.+)"
+    value: 1
+    name: kafka_$1_app_info
     labels:
-      target: "$1"
-      topic: "$2"
-      partition: "$3"
-    help: "Kafka Mirror Maker 2 Source Connector metrics"
-    cache: true
+      client_type: $1
+      client_id: $2
+      $3: $4
+    type: UNTYPED
+  # "kafka.consumer:type=consumer-metrics,client-id=*, protocol=*, cipher=*"
+  # "kafka.consumer:type=type=consumer-fetch-manager-metrics,client-id=*, topic=*, partition=*"
+  # "kafka.producer:type=producer-metrics,client-id=*, protocol=*, cipher=*"
+  - pattern: "kafka.(.+)<type=(.+), (.+)=(.+), (.+)=(.+), (.+)=(.+)><>(.+):"
+    name: kafka_$1_$2_$9
     type: GAUGE
-
-  #kafka.connect:type=MirrorCheckpointConnector
-  - pattern: kafka.connect.mirror<type=MirrorCheckpointConnector, source=(.+), target=(.+), group=(.+), topic=(.+), partition=(.+)><>(.+-count|.+-total|.+-ms)
-    name: kafka_connect_mirror_mirrorcheckpointconnector_$6
     labels:
-      source: "$1"
-      target: "$2"
-      group: "$3"
-      topic: "$4"
-      partition: "$5"
-    help: "Kafka Mirror Maker 2 Checkpoint Connector metrics"
-    cache: true
+      client_type: $1
+      $3: "$4"
+      $5: "$6"
+      $7: "$8"
+  # "kafka.consumer:type=consumer-node-metrics,client-id=*, node-id=*"
+  # "kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*, topic=*"
+  # "kafka.producer:type=producer-node-metrics,client-id=*, node-id=*"
+  # "kafka.producer:type=producer-topic-metrics,client-id=*, topic=*"
+  - pattern: "kafka.(.+)<type=(.+), (.+)=(.+), (.+)=(.+)><>(.+):"
+    name: kafka_$1_$2_$7
     type: GAUGE
+    labels:
+      client_type: $1
+      $3: "$4"
+      $5: "$6"
+  # "kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*"
+  # "kafka.consumer:type=consumer-metrics,client-id=*"
+  # "kafka.producer:type=producer-metrics,client-id=*"
+  - pattern: "kafka.(.+)<type=(.+), (.+)=(.+)><>(.+):"
+    name: kafka_$1_$2_$5
+    type: GAUGE
+    labels:
+      client_type: $1
+      $3: "$4"
+  - pattern: "kafka.(.+)<type=(.+)><>(.+):"
+    name: kafka_$1_$2_$3
+    labels:
+      client_type: $1
