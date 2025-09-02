@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: *app
   annotations:
     prometheus.io/scrape: "false"
-    uw.health.aggregator.enable: 'false'
+    uw.health.aggregator.enable: "false"
 spec:
   clusterIP: None
   ports:
@@ -16,7 +16,6 @@ spec:
   selector:
     app.kubernetes.io/name: *app
 ---
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -38,8 +37,22 @@ spec:
       labels:
         app: *app
         app.kubernetes.io/name: *app
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "5556"
+        prometheus.io/scrape: "true"
     spec:
       terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: copy-jmx-exporter
+          image: quay.io/utilitywarehouse/docker-jmx-prometheus-javaagent-lib:v1.4.0-1
+          command:
+            - cp
+            - /lib/jmx_prometheus_javaagent-1.4.0.jar
+            - /jmx-exporter/jmx_prometheus_javaagent.jar
+          volumeMounts:
+            - name: jmx-exporter
+              mountPath: /jmx-exporter
       containers:
         - name: *app
           imagePullPolicy: Always
@@ -48,7 +61,14 @@ spec:
             - containerPort: 8083
               name: api
               protocol: TCP
+            - containerPort: 5556
+              name: prometheus
+              protocol: TCP
           env:
+            - name: KAFKA_OPTS
+              value: "-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=5556:/jmx-exporter-config/config.yaml"
+            - name: JMX_PORT
+              value: "5555"
             - name: CONNECT_REST_PORT
               value: "8083"
             - name: CONNECT_SECURITY_PROTOCOL
@@ -122,9 +142,18 @@ spec:
             - name: kafka-certificates
               mountPath: /etc/kafka-connect/certs
               readOnly: true
+            - name: jmx-exporter
+              mountPath: /jmx-exporter
+            - name: jmx-exporter-config
+              mountPath: /jmx-exporter-config
       volumes:
         - name: kafka-certificates
           secret:
             # The name of the secret set in kafka-cert.yaml, holding the tls assets
             secretName: TBD
-
+        - name: jmx-exporter
+          emptyDir: {}
+        - name: jmx-exporter-config
+          configMap:
+            defaultMode: 420
+            name: kafka-connect-jmx-exporter-config

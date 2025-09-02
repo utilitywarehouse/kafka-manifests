@@ -5,7 +5,10 @@ resources:
   - kafka-cert.yaml
   - statefulset.yaml
 
-
+configMapGenerator:
+  - name: kafka-connect-jmx-exporter-config
+    files:
+      - config.yaml=config/jmx-exporter-config.yaml
 # Example on how to create the secret holding the jks data.
 #secretGenerator:
 #  - name: kafka-connect-jks-data
