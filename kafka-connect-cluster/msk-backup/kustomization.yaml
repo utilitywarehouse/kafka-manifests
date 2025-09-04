@@ -26,6 +26,9 @@ configMapGenerator:
   - name: connector-payloads
     files:
       - backup-connector.yaml=connector-payloads/backup-connector.yaml
+  - name: kafka-connect-log4j-config
+    files:
+      - connect-log4j.properties=config/connect-log4j.properties
 # Example on how to create the secret holding the jks data.
 #secretGenerator:
 #  - name: msk-backup-kafka-connect-jks-data
@@ -33,4 +36,3 @@ configMapGenerator:
 #      - ./secrets/jks.properties
 #    options:
 #      disableNameSuffixHash: true
-
