@@ -65,19 +65,19 @@ spec:
               protocol: TCP
           startupProbe:
             failureThreshold: 30
-            initialDelaySeconds: 30
+            initialDelaySeconds: 10
             periodSeconds: 3
             tcpSocket:
               port: api
           livenessProbe:
-            initialDelaySeconds: 30
+            initialDelaySeconds: 10
             tcpSocket:
               port: api
           readinessProbe:
             httpGet:
               path: /connectors
               port: api
-            initialDelaySeconds: 30
+            initialDelaySeconds: 10
           env:
             - name: KAFKA_OPTS
               value: "-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=5556:/jmx-exporter-config/config.yaml"
