@@ -61,6 +61,8 @@ spec:
                   # the name of the secret that holds the data for jks
                   name: msk-backup-kafka-connect-jks-data
                   key: jks.password
+            - name: KAFKA_LOG4J_OPTS
+              value: -Dlog4j.configuration=file:/log4j-config/connect-log4j.properties
           resources:
             requests:
               cpu: 0
@@ -74,6 +76,8 @@ spec:
               readOnly: true
             - name: extra-connectors
               mountPath: /usr/share/extra-connectors
+            - name: log4j-config
+              mountPath: /log4j-config
       initContainers:
         - name: copy-lenses-connector
           image: quay.io/utilitywarehouse/docker-lensesio-kafka-connect-aws-s3-lib:v8.1.31-1
@@ -90,3 +94,6 @@ spec:
           secret:
             # The name of the secret set in kafka-cert.yaml, holding the tls assets
             secretName: msk-backup-kafka-connect-cert
+        - name: log4j-config
+          configMap:
+            name: kafka-connect-log4j-config
