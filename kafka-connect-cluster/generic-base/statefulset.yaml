@@ -64,13 +64,13 @@ spec:
               name: prometheus
               protocol: TCP
           startupProbe:
-            failureThreshold: 10
-            initialDelaySeconds: 10
+            failureThreshold: 30
+            initialDelaySeconds: 30
             periodSeconds: 1
             tcpSocket:
               port: api
           livenessProbe:
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             periodSeconds: 10
             tcpSocket:
               port: api
