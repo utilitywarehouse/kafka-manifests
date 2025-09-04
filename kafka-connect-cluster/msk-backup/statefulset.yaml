@@ -75,19 +75,11 @@ spec:
             - name: extra-connectors
               mountPath: /usr/share/extra-connectors
       initContainers:
-        - name: download-connectors
-          image: alpine
+        - name: copy-lenses-connector
+          image: quay.io/utilitywarehouse/docker-lensesio-kafka-connect-aws-s3-lib:v8.1.31-1
+          command: ["/bin/sh", "-c", "--"]
           args:
-            - /bin/sh
-            - -c
-            - |
-              apk add --no-cache curl unzip
-              curl -sSL https://github.com/lensesio/stream-reactor/releases/download/${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}.zip -o /tmp/kafka-connect-aws-s3.zip
-              unzip -d /tmp /tmp/kafka-connect-aws-s3.zip
-              cp /tmp/kafka-connect-aws-s3-${LENSES_IO_CONNECTOR_VERSION}/kafka-connect-aws-s3-assembly-${LENSES_IO_CONNECTOR_VERSION}.jar /usr/share/extra-connectors
-          env:
-            - name: LENSES_IO_CONNECTOR_VERSION
-              value: 8.1.31
+            - cp /opt/lib/kafka-connect-aws-s3-*.jar /usr/share/extra-connectors
           volumeMounts:
             - name: extra-connectors
               mountPath: /usr/share/extra-connectors
