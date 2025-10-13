@@ -12,3 +12,4 @@ spec:
         key: jks.password
         name: msk-backup-kafka-connect-jks-data # the name of the secret that holds the data for jks
   secretName: msk-backup-kafka-connect-cert # the name of the secret that will be loaded with tls assets
+
