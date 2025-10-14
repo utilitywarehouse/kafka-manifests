@@ -93,7 +93,7 @@ spec:
         - name: kafka-certificates
           secret:
             # The name of the secret set in kafka-cert.yaml, holding the tls assets
-            secretName: kafka-connect-cert
+            secretName: msk-backup-kafka-connect-cert
         - name: log4j-config
           configMap:
             name: kafka-connect-log4j-config
