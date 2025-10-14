@@ -1,14 +1,13 @@
----
 name: msk-s3-backup-sink-all-parquet
 config:
   name: msk-s3-backup-sink-all-parquet
   connector.class: io.lenses.streamreactor.connect.aws.s3.sink.S3SinkConnector
-  tasks.max: '2'
+  tasks.max: "2"
   # include all topic, except:
   # - all topics created by mirror maker
   # - auth.iam-cerbos-audit-v1 currently this one can not be indexed due to an issue with the headers
   topics.regex: ^(?!auth\.iam-cerbos-audit-v1$)(?!__amazon_msk_canary$)(?!.*heartbeats$)(?!.*\.checkpoints\.internal$)(?!mm2-).*
-  key.converter.schemas.enable: 'false'
+  key.converter.schemas.enable: "false"
   # consume from all topics, thus we need to specify the topic in the partitioning part.
   # using the Parquet format, as this is the most performant both for backup and restoring
   # 'store.envelope'=true - so that we can restore headers, timestamp, etc
@@ -21,10 +20,10 @@ config:
     'flush.count'=10000,
     'flush.interval'=1800,
     'partition.include.keys'=false);
-  value.converter.schemas.enable: 'false'
+  value.converter.schemas.enable: "false"
   connect.s3.aws.auth.mode: Default
   connect.s3.compression.codec: zstd
-  connect.s3.compression.level: '9'
+  connect.s3.compression.level: "9"
   connect.s3.aws.region: eu-west-1
   value.converter: org.apache.kafka.connect.converters.ByteArrayConverter
   key.converter: org.apache.kafka.connect.converters.ByteArrayConverter
