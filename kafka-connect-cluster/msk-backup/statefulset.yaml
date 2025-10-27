@@ -23,7 +23,7 @@ spec:
 
             # Update the heap options to match the maximum allocated
             - name: KAFKA_HEAP_OPTS
-              value: -Xmx4G -Xms1G
+              value: -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=75.0 -XX:+UseG1GC -XX:+UseStringDeduplication
             - name: CONNECT_PLUGIN_PATH
               value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/extra-connectors"
             - name: POD_NAME
@@ -68,7 +68,7 @@ spec:
               cpu: 0
               memory: 1Gi
             limits:
-              cpu: 2
+              cpu: 3
               memory: 5.5Gi
           volumeMounts:
             - name: kafka-certificates
