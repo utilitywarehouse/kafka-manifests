@@ -20,10 +20,6 @@ spec:
           env:
             - name: CONNECT_BOOTSTRAP_SERVERS
               value: "TBD"
-
-            # Update the heap options to match the maximum allocated
-            - name: KAFKA_HEAP_OPTS
-              value: -XX:+UseContainerSupport -XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0 -XX:+UseG1GC -XX:+UseStringDeduplication
             - name: CONNECT_PLUGIN_PATH
               value: "/usr/share/java,/usr/share/confluent-hub-components/,/usr/share/extra-connectors"
             - name: POD_NAME
@@ -68,8 +64,8 @@ spec:
               cpu: 0
               memory: 1Gi
             limits:
-              cpu: 4
-              memory: 6Gi
+              cpu: 2
+              memory: 3Gi
           volumeMounts:
             - name: kafka-certificates
               mountPath: /etc/kafka-connect/certs
