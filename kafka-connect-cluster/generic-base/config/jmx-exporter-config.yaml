@@ -76,7 +76,6 @@ rules:
   # kafka.connect:type=source-task-metrics,connector=*,task=*
   # kafka.connect:type=sink-task-metrics,connector=*,task=*
   # kafka.connect:type=connector-task-metrics,connector=*,task=*
-  # Note: The 'attrNameSnakeCase: true' setting may make this rule redundant.
   - pattern: "kafka.connect<type=(.+)-task-metrics, connector=(.+), task=(\\d+)><>(.+): (.+)"
     name: kafka_connect_$1_task_metrics_$4
     labels:
