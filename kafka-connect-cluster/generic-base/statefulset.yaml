@@ -81,6 +81,8 @@ spec:
           env:
             - name: KAFKA_OPTS
               value: "-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=5556:/jmx-exporter-config/config.yaml"
+            - name: KAFKA_HEAP_OPTS
+              value: -XX:+UseContainerSupport -XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0 -XX:+UseG1GC -XX:+UseStringDeduplication
             - name: JMX_PORT
               value: "5555"
             - name: CONNECT_REST_PORT
@@ -149,9 +151,12 @@ spec:
                   name: TBD
                   key: jks.password
           resources:
+            requests:
+              cpu: 0
+              memory: 100Mi
             limits:
               cpu: 2
-              memory: 2.5Gi
+              memory: 1Gi
           volumeMounts:
             - name: kafka-certificates
               mountPath: /etc/kafka-connect/certs
