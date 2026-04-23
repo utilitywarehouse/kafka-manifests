@@ -221,6 +221,7 @@ metadata:
     app.kubernetes.io/instance: 22.1.1
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: kafka
+    uw.systems/mirror: "true"
 spec:
   type: ClusterIP
   clusterIP: None
