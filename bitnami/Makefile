@@ -6,19 +6,6 @@ VALUES_NON_TLS="config/values-non-tls.yaml"
 # linux: cat /proc/sys/kernel/random/uuid | tr -d '-' | base64 | cut -b 1-22
 # macos: uuidgen | tr -d '-' | base64 | cut -b 1-22
 
-.PHONY: gen-otel-kafka
-gen-otel-kafka:
-	docker run -ti --rm \
-	  -v $${PWD}:/opt/manifests \
-	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
-	  -e NS="otel" \
-	  -e NAME="kafka-bitnami" \
-	  -e KRAFT_CLUSTERID="MTkwQzczMTJCRUI1NEQ0N0" \
-	  -e VALUES=${VALUES_TLS} \
-	  --workdir=/opt/manifests \
-	  --entrypoint=/bin/sh \
-	  alpine/helm ./gen-yaml/gen
-
 .PHONY: gen-energy-platform-bitnami-kafka-non-tls
 gen-energy-platform-bitnami-kafka-non-tls:
 	docker run -ti --rm \
