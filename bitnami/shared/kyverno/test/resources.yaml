@@ -1,0 +1,73 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: valid-cert
+  namespace: team-c
+spec:
+  commonName: "team-c/valid" # Starts with namespace prefix (PASS)
+  issuerRef:
+    name: aws-pca
+  secretName: valid-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: invalid-cert
+  namespace: team-c
+spec:
+  commonName: "wrong-ns/invalid" # Does not start with team-c prefix (FAIL)
+  issuerRef:
+    name: kafka-shared-selfsigned-issuer
+  secretName: invalid-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: skip-cert
+  namespace: team-c
+spec:
+  commonName: "doesnt-matter/skip"
+  issuerRef:
+    name: some-other-issuer # Doesn't match precondition issuers (SKIP)
+  secretName: skip-cert
+---
+# Mock Resources for Generation & Mutation Policies
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msk-app
+  namespace: team-c
+  annotations:
+    uw.systems/msk-kafka-client: "msk-client"
+spec:
+  selector:
+    matchLabels:
+      app: msk-app
+  template:
+    metadata:
+      labels:
+        app: msk-app
+    spec:
+      containers:
+        - name: app
+          image: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uw-app
+  namespace: team-c
+  annotations:
+    uw.systems/uw-hosted-kafka-client: "uw-client"
+spec:
+  selector:
+    matchLabels:
+      app: uw-app
+  template:
+    metadata:
+      labels:
+        app: uw-app
+    spec:
+      containers:
+        - name: app
+          image: nginx
