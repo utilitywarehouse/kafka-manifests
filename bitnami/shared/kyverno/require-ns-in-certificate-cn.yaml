@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: require-cn-to-start-with-namespace
   annotations:
@@ -10,24 +10,22 @@ metadata:
     policies.kyverno.io/description: >-
       certificates requests should prefix CN with the origin namespace
 spec:
-  validationFailureAction: Enforce
-  background: true
-  rules:
-    - name: require-certificate-cn-prefix
-      match:
-        resources:
-          kinds:
-            - Certificate
-      preconditions:
-        any:
-          - key: "{{ request.object.spec.issuerRef.name || '' }}"
-            operator: Equals
-            value: kafka-shared-selfsigned-issuer
-          - key: "{{ request.object.spec.issuerRef.name || '' }}"
-            operator: Equals
-            value: aws-pca  
-      validate:
-        message: "CN must be prefixed with the namespace"
-        pattern:
-          spec:
-            commonName: "{{ request.namespace }}/*"
+  validationActions:
+    - Deny
+
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["cert-manager.io"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["certificates"]
+
+  matchConditions:
+    - name: "is-target-issuer"
+      expression: >
+        object.spec.?issuerRef.?name.orValue("") in ['kafka-shared-selfsigned-issuer', 'aws-pca']
+
+  validations:
+    - expression: >
+        object.spec.?commonName.orValue("").startsWith(object.metadata.?namespace.orValue("") + "/")
+      message: "CN must be prefixed with the namespace"
