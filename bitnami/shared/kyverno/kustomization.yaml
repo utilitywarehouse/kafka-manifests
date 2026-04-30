@@ -2,5 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - generate-kafka-certificate.yaml
+  - mount-kafka-cert-volume.yaml
   - require-ns-in-certificate-cn.yaml
-  - kafka-client-policies.yaml

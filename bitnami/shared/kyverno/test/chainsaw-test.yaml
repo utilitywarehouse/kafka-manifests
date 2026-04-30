@@ -1,0 +1,184 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: test-certificates-policies
+spec:
+  steps:
+    - name: setup-prerequisites
+      try:
+        - apply:
+            file: certificates-crd.yaml
+
+        - apply:
+            file: prerequisite-resources.yaml
+
+    - name: apply-policies-and-exceptions
+      try:
+        - apply:
+            file: ../mount-kafka-cert-volume.yaml
+        - apply:
+            file: ../require-ns-in-certificate-cn.yaml
+        - apply:
+            file: ../generate-kafka-certificate.yaml
+
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: require-cn-to-start-with-namespace
+              status:
+                conditionStatus:
+                  (conditions[?type == 'RBACPermissionsGranted']):
+                    - reason: Succeeded
+                      status: "True"
+                  (conditions[?type == 'WebhookConfigured']):
+                    - reason: Succeeded
+                      status: "True"
+
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: GeneratingPolicy
+              metadata:
+                name: generate-msk-kafka-certificate
+              status:
+                conditionStatus:
+                  (conditions[?type == 'RBACPermissionsGranted']):
+                    - reason: Succeeded
+                      status: "True"
+                  (conditions[?type == 'WebhookConfigured']):
+                    - reason: Succeeded
+                      status: "True"
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: GeneratingPolicy
+              metadata:
+                name: generate-uw-hosted-kafka-certificate
+              status:
+                conditionStatus:
+                  (conditions[?type == 'RBACPermissionsGranted']):
+                    - reason: Succeeded
+                      status: "True"
+                  (conditions[?type == 'WebhookConfigured']):
+                    - reason: Succeeded
+                      status: "True"
+
+    - name: deploy-test-resources
+      try:
+        - apply:
+            file: resources.yaml
+            expect:
+              # confirm validation failures
+              - match:
+                  apiVersion: cert-manager.io/v1
+                  kind: Certificate
+                  metadata:
+                    name: invalid-cert
+                check:
+                  ($error != null): true
+                  "(contains(to_string($error), 'CN must be prefixed with the namespace'))": true
+
+    - name: assert-kafka-deployment-cert-mount
+      try:
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: msk-app
+                namespace: team-c
+                annotations:
+                  uw.systems/msk-kafka-client: "msk-client"
+              spec:
+                selector:
+                  matchLabels:
+                    app: msk-app
+                template:
+                  metadata:
+                    labels:
+                      app: msk-app
+                  spec:
+                    containers:
+                      - name: app
+                        image: nginx
+                        volumeMounts:
+                          - name: kafka-client-cert
+                            mountPath: /certs
+                            readOnly: true
+                    volumes:
+                      - name: kafka-client-cert
+                        secret:
+                          secretName: msk-app-gen-msk-kafka-cert
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: uw-app
+                namespace: team-c
+                annotations:
+                  uw.systems/uw-hosted-kafka-client: "uw-client"
+              spec:
+                selector:
+                  matchLabels:
+                    app: uw-app
+                template:
+                  metadata:
+                    labels:
+                      app: uw-app
+                  spec:
+                    containers:
+                      - name: app
+                        image: nginx
+                        volumeMounts:
+                          - name: kafka-client-cert
+                            mountPath: /certs
+                            readOnly: true
+                    volumes:
+                      - name: kafka-client-cert
+                        secret:
+                          secretName: uw-app-gen-uw-kafka-cert
+
+    - name: assert-kafka-cert-generation
+      try:
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: cert-manager.io/v1
+              kind: Certificate
+              metadata:
+                name: msk-app-gen-msk-kafka-cert
+                namespace: team-c
+              spec:
+                commonName: team-c/msk-client
+                duration: 168h0m0s
+                renewBefore: 96h0m0s
+                issuerRef:
+                  group: awspca.cert-manager.io
+                  kind: AWSPCAClusterIssuer
+                  name: aws-pca
+                secretName: msk-app-gen-msk-kafka-cert
+
+        - assert:
+            timeout: 30s
+            resource:
+              apiVersion: cert-manager.io/v1
+              kind: Certificate
+              metadata:
+                name: uw-app-gen-uw-kafka-cert
+                namespace: team-c
+              spec:
+                commonName: team-c/uw-client
+                duration: 168h0m0s
+                renewBefore: 96h0m0s
+                issuerRef:
+                  kind: ClusterIssuer
+                  name: kafka-shared-selfsigned-issuer
+                secretName: uw-app-gen-uw-kafka-cert

@@ -1,0 +1,102 @@
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
+metadata:
+  name: generate-msk-kafka-certificate
+  annotations:
+    policies.kyverno.io/title: Create MSK certificate for Kafka client
+    policies.kyverno.io/subject: Deployment, StatefulSet
+spec:
+  evaluation:
+    synchronize:
+      enabled: true
+    generateExisting:
+      enabled: true
+    orphanDownstreamOnPolicyDelete:
+      enabled: true
+
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "statefulsets"]
+
+  matchConditions:
+    - name: "has-msk-client-annotation"
+      expression: >
+        has(object.metadata.annotations) && 
+        'uw.systems/msk-kafka-client' in object.metadata.annotations
+
+  variables:
+    - name: certResource
+      expression: |
+        yaml.parse('''
+        apiVersion: cert-manager.io/v1
+        kind: Certificate
+        metadata:
+          name: ''' + object.metadata.name + '''-gen-msk-kafka-cert
+          namespace: ''' + object.metadata.namespace + '''
+        spec:
+          commonName: ''' + object.metadata.namespace + '''/''' + object.metadata.annotations["uw.systems/msk-kafka-client"] + '''
+          duration: 168h0m0s
+          renewBefore: 96h0m0s
+          issuerRef:
+            group: awspca.cert-manager.io
+            kind: AWSPCAClusterIssuer
+            name: aws-pca
+          secretName: ''' + object.metadata.name + '''-gen-msk-kafka-cert
+        ''')
+
+  generate:
+    - expression: generator.Apply(object.metadata.namespace, [variables.certResource])
+---
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
+metadata:
+  name: generate-uw-hosted-kafka-certificate
+  annotations:
+    policies.kyverno.io/title: Create UW-hosted certificate for Kafka client
+    policies.kyverno.io/subject: Deployment, StatefulSet
+spec:
+  evaluation:
+    synchronize:
+      enabled: true
+    generateExisting:
+      enabled: true
+    orphanDownstreamOnPolicyDelete:
+      enabled: true
+
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "statefulsets"]
+
+  matchConditions:
+    - name: "has-uw-hosted-client-annotation"
+      expression: >
+        has(object.metadata.annotations) && 
+        'uw.systems/uw-hosted-kafka-client' in object.metadata.annotations
+
+  variables:
+    - name: certResource
+      expression: |
+        yaml.parse('''
+        apiVersion: cert-manager.io/v1
+        kind: Certificate
+        metadata:
+          name: ''' + object.metadata.name + '''-gen-uw-kafka-cert
+          namespace: ''' + object.metadata.namespace + '''
+        spec:
+          commonName: ''' + object.metadata.namespace + '''/''' + object.metadata.annotations["uw.systems/uw-hosted-kafka-client"] + '''
+          duration: 168h0m0s
+          renewBefore: 96h0m0s
+          issuerRef:
+            kind: ClusterIssuer
+            name: kafka-shared-selfsigned-issuer
+          secretName: ''' + object.metadata.name + '''-gen-uw-kafka-cert
+        ''')
+
+  generate:
+    - expression: generator.Apply(object.metadata.namespace, [variables.certResource])
