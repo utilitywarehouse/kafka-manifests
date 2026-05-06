@@ -1,98 +1,71 @@
-apiVersion: policies.kyverno.io/v1
-kind: GeneratingPolicy
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
 metadata:
-  name: generate-msk-kafka-certificate
+  name: generate-kafka-certificate
   annotations:
-    policies.kyverno.io/title: Create MSK certificate for Kafka client
-    policies.kyverno.io/subject: Deployment, StatefulSet
+    policies.kyverno.io/title: Create certificate for Kafka client
+    policies.kyverno.io/category: Sample
+    policies.kyverno.io/subject: Deployment, Statefulset
+    policies.kyverno.io/description: >-
+      This policy creates the kafka client certificate for the annotated targets.
 spec:
-  evaluation:
-    synchronize:
-      enabled: true
-    orphanDownstreamOnPolicyDelete:
-      enabled: true
-
-  matchConstraints:
-    resourceRules:
-      - apiGroups: ["apps"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["deployments", "statefulsets"]
-
-  matchConditions:
-    - name: "has-msk-client-annotation"
-      expression: >
-        has(object.metadata.annotations) &&
-        'uw.systems/msk-kafka-client' in object.metadata.annotations
-
-  variables:
-    - name: certResource
-      expression: |
-        yaml.parse('''
+  # Generate for existing targets
+  generateExisting: true
+  background: true
+  rules:
+    # using separate rule for each annotation, as the issuer, cert name and secret name are different for the generated Certificates
+    - name: generate-msk-kafka-certificate
+      match:
+        any:
+          - resources:
+              annotations:
+                uw.systems/msk-kafka-client: "*"
+              kinds:
+                - Deployment
+                - StatefulSet
+      generate:
+        # Delete certificate if the target is deleted
+        synchronize: true
+        # Keep the generated certificates if the policy is deleted
+        orphanDownstreamOnPolicyDelete: true
         apiVersion: cert-manager.io/v1
         kind: Certificate
-        metadata:
-          name: ''' + object.metadata.name + '''-gen-msk-kafka-cert
-          namespace: ''' + object.metadata.namespace + '''
-        spec:
-          commonName: ''' + object.metadata.namespace + '''/''' + object.metadata.annotations["uw.systems/msk-kafka-client"] + '''
-          duration: 168h0m0s
-          renewBefore: 96h0m0s
-          issuerRef:
-            group: awspca.cert-manager.io
-            kind: AWSPCAClusterIssuer
-            name: aws-pca
-          secretName: ''' + object.metadata.name + '''-gen-msk-kafka-cert
-        ''')
-
-  generate:
-    - expression: generator.Apply(object.metadata.namespace, [variables.certResource])
----
-apiVersion: policies.kyverno.io/v1
-kind: GeneratingPolicy
-metadata:
-  name: generate-uw-hosted-kafka-certificate
-  annotations:
-    policies.kyverno.io/title: Create UW-hosted certificate for Kafka client
-    policies.kyverno.io/subject: Deployment, StatefulSet
-spec:
-  evaluation:
-    synchronize:
-      enabled: true
-    orphanDownstreamOnPolicyDelete:
-      enabled: true
-
-  matchConstraints:
-    resourceRules:
-      - apiGroups: ["apps"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["deployments", "statefulsets"]
-
-  matchConditions:
-    - name: "has-uw-hosted-client-annotation"
-      expression: >
-        has(object.metadata.annotations) &&
-        'uw.systems/uw-hosted-kafka-client' in object.metadata.annotations
-
-  variables:
-    - name: certResource
-      expression: |
-        yaml.parse('''
+        name: "{{request.object.metadata.name}}-gen-msk-kafka-cert"
+        namespace: "{{request.namespace}}"
+        data:
+          spec:
+            commonName: '{{request.namespace}}/{{request.object.metadata.annotations."uw.systems/msk-kafka-client"}}'
+            duration: 168h0m0s # 7 days validity
+            renewBefore: 96h0m0s # renews 4d before expiry to give us room to act if renewal fails.
+            issuerRef:
+              group: awspca.cert-manager.io
+              kind: AWSPCAClusterIssuer
+              name: aws-pca
+            secretName: "{{request.object.metadata.name}}-gen-msk-kafka-cert"
+    - name: generate-uw-hosted-kafka-certificate
+      match:
+        any:
+          - resources:
+              annotations:
+                uw.systems/uw-hosted-kafka-client: "*"
+              kinds:
+                - Deployment
+                - StatefulSet
+      generate:
+        # Delete certificate if the target is deleted
+        synchronize: true
+        # Keep the generated certificates if the policy is deleted
+        orphanDownstreamOnPolicyDelete: true
         apiVersion: cert-manager.io/v1
         kind: Certificate
-        metadata:
-          name: ''' + object.metadata.name + '''-gen-uw-kafka-cert
-          namespace: ''' + object.metadata.namespace + '''
-        spec:
-          commonName: ''' + object.metadata.namespace + '''/''' + object.metadata.annotations["uw.systems/uw-hosted-kafka-client"] + '''
-          duration: 168h0m0s
-          renewBefore: 96h0m0s
-          issuerRef:
-            kind: ClusterIssuer
-            name: kafka-shared-selfsigned-issuer
-          secretName: ''' + object.metadata.name + '''-gen-uw-kafka-cert
-        ''')
-
-  generate:
-    - expression: generator.Apply(object.metadata.namespace, [variables.certResource])
+        name: "{{request.object.metadata.name}}-gen-uw-kafka-cert"
+        namespace: "{{request.namespace}}"
+        data:
+          spec:
+            commonName: '{{request.namespace}}/{{request.object.metadata.annotations."uw.systems/uw-hosted-kafka-client"}}'
+            duration: 168h0m0s # 7 days validity
+            renewBefore: 96h0m0s # renews 4d before expiry to give us room to act if renewal fails.
+            issuerRef:
+              kind: ClusterIssuer
+              name: kafka-shared-selfsigned-issuer
+            secretName: "{{request.object.metadata.name}}-gen-uw-kafka-cert"

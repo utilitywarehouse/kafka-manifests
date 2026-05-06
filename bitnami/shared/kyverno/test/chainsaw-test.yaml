@@ -40,33 +40,14 @@ spec:
         - assert:
             timeout: 30s
             resource:
-              apiVersion: policies.kyverno.io/v1
-              kind: GeneratingPolicy
+              apiVersion: kyverno.io/v1
+              kind: ClusterPolicy
               metadata:
-                name: generate-msk-kafka-certificate
+                name: generate-kafka-certificate
               status:
-                conditionStatus:
-                  (conditions[?type == 'RBACPermissionsGranted']):
-                    - reason: Succeeded
-                      status: "True"
-                  (conditions[?type == 'WebhookConfigured']):
-                    - reason: Succeeded
-                      status: "True"
-        - assert:
-            timeout: 30s
-            resource:
-              apiVersion: policies.kyverno.io/v1
-              kind: GeneratingPolicy
-              metadata:
-                name: generate-uw-hosted-kafka-certificate
-              status:
-                conditionStatus:
-                  (conditions[?type == 'RBACPermissionsGranted']):
-                    - reason: Succeeded
-                      status: "True"
-                  (conditions[?type == 'WebhookConfigured']):
-                    - reason: Succeeded
-                      status: "True"
+                (conditions[?type == 'Ready']):
+                  - reason: Succeeded
+                    status: "True"
 
     - name: deploy-test-resources
       try:
