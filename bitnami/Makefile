@@ -32,6 +32,19 @@ gen-finance-platform-bitnami-kafka-non-tls:
 	  --entrypoint=/bin/sh \
 	  alpine/helm ./gen-yaml/gen
 
+.PHONY: gen-staging-ept-bitnami-kafka-non-tls
+gen-staging-ept-bitnami-kafka-non-tls:
+	docker run -ti --rm \
+	  -v $${PWD}:/opt/manifests \
+	  -e BITNAMI_KAFKA_RELEASE=${BITNAMI_KAFKA_RELEASE} \
+	  -e NS="staging-ept" \
+	  -e NAME="kafka-bitnami" \
+	  -e KRAFT_CLUSTERID="N0IxNTA5QjJEMTg3NDk4Q0" \
+	  -e VALUES=${VALUES_NON_TLS} \
+	  --workdir=/opt/manifests \
+	  --entrypoint=/bin/sh \
+	  alpine/helm ./gen-yaml/gen
+
 .PHONY: gen-customer-billing-kafka-non-tls
 gen-customer-billing-kafka-non-tls:
 	docker run -ti --rm \
