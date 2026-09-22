@@ -14,8 +14,8 @@
 #        provider: okta
 #        redirect-uri: TBD
 #        authorization-grant-type: authorization_code
-#        issuer-uri: https://login.uw.systems/oauth2/default
-#        jwk-set-uri: https://login.uw.systems/oauth2/default/v1/keys
+#        issuer-uri: https://login.uw.systems
+#        jwk-set-uri: https://login.uw.systems/oauth2/v1/keys
 #        user-name-attribute: email
 #        custom-params:
 #          type: oauth
