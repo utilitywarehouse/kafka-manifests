@@ -182,3 +182,24 @@ spec:
                   kind: ClusterIssuer
                   name: kafka-shared-selfsigned-issuer
                 secretName: uw-app-gen-uw-kafka-cert
+
+    - name: assert-kafka-cert-recreated-when-deleted
+      try:
+        - delete:
+            ref:
+              apiVersion: cert-manager.io/v1
+              kind: Certificate
+              name: msk-app-gen-msk-kafka-cert
+              namespace: team-c
+
+        - assert:
+            timeout: 60s
+            resource:
+              apiVersion: cert-manager.io/v1
+              kind: Certificate
+              metadata:
+                name: msk-app-gen-msk-kafka-cert
+                namespace: team-c
+              spec:
+                commonName: team-c/msk-client
+                secretName: msk-app-gen-msk-kafka-cert
