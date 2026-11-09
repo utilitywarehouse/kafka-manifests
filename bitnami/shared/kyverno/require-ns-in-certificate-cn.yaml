@@ -10,6 +10,9 @@ metadata:
     policies.kyverno.io/description: >-
       certificates requests should prefix CN with the origin namespace
 spec:
+  autogen:
+    validatingAdmissionPolicy:
+      enabled: true
   validationActions:
     - Deny
 

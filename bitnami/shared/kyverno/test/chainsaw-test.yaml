@@ -22,20 +22,8 @@ spec:
             file: ../generate-kafka-certificate.yaml
 
         - assert:
-            timeout: 30s
-            resource:
-              apiVersion: policies.kyverno.io/v1
-              kind: ValidatingPolicy
-              metadata:
-                name: require-cn-to-start-with-namespace
-              status:
-                conditionStatus:
-                  (conditions[?type == 'RBACPermissionsGranted']):
-                    - reason: Succeeded
-                      status: "True"
-                  (conditions[?type == 'WebhookConfigured']):
-                    - reason: Succeeded
-                      status: "True"
+            timeout: 120s
+            file: admission-policies.yaml
 
         - assert:
             timeout: 30s
