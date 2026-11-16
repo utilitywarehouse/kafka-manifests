@@ -1,34 +1,30 @@
-apiVersion: policies.kyverno.io/v1
-kind: ValidatingPolicy
+# Require Namespace in Certificate CN
+# certificates requests should prefix CN with the origin namespace
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
 metadata:
   name: require-cn-to-start-with-namespace
-  annotations:
-    policies.kyverno.io/title: Require Namespace IN Certificate CN
-    policies.kyverno.io/category: cert-manager
-    policies.kyverno.io/severity: medium
-    policies.kyverno.io/subject: Certificate
-    policies.kyverno.io/description: >-
-      certificates requests should prefix CN with the origin namespace
 spec:
-  autogen:
-    validatingAdmissionPolicy:
-      enabled: true
-  validationActions:
-    - Deny
-
+  failurePolicy: Fail
   matchConstraints:
     resourceRules:
       - apiGroups: ["cert-manager.io"]
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["certificates"]
-
   matchConditions:
-    - name: "is-target-issuer"
-      expression: >
+    - name: is-target-issuer
+      expression: >-
         object.spec.?issuerRef.?name.orValue("") in ['kafka-shared-selfsigned-issuer', 'aws-pca']
-
   validations:
-    - expression: >
+    - expression: >-
         object.spec.?commonName.orValue("").startsWith(object.metadata.?namespace.orValue("") + "/")
       message: "CN must be prefixed with the namespace"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: require-cn-to-start-with-namespace-binding
+spec:
+  policyName: require-cn-to-start-with-namespace
+  validationActions: [Deny]

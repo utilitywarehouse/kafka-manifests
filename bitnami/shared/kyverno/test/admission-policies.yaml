@@ -1,62 +1,47 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicy
 metadata:
-  name: vpol-require-cn-to-start-with-namespace
+  name: require-cn-to-start-with-namespace
 spec:
-  matchConstraints:
-    resourceRules:
-      - apiGroups: ["cert-manager.io"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["certificates"]
+  failurePolicy: Fail
   (validations[0].message): CN must be prefixed with the namespace
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicyBinding
 metadata:
-  name: vpol-require-cn-to-start-with-namespace-binding
+  name: require-cn-to-start-with-namespace-binding
 spec:
-  policyName: vpol-require-cn-to-start-with-namespace
+  policyName: require-cn-to-start-with-namespace
   validationActions: [Deny]
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingAdmissionPolicy
 metadata:
-  name: mpol-mount-msk-kafka-certificate-volume
+  name: mount-msk-kafka-certificate-volume
 spec:
+  failurePolicy: Fail
   reinvocationPolicy: Never
-  matchConstraints:
-    resourceRules:
-      - apiGroups: ["apps"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["deployments", "statefulsets"]
   (mutations[0].patchType): ApplyConfiguration
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingAdmissionPolicyBinding
 metadata:
-  name: mpol-mount-msk-kafka-certificate-volume-binding
+  name: mount-msk-kafka-certificate-volume-binding
 spec:
-  policyName: mpol-mount-msk-kafka-certificate-volume
+  policyName: mount-msk-kafka-certificate-volume
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingAdmissionPolicy
 metadata:
-  name: mpol-mount-uw-hosted-kafka-certificate-volume
+  name: mount-uw-hosted-kafka-certificate-volume
 spec:
+  failurePolicy: Fail
   reinvocationPolicy: Never
-  matchConstraints:
-    resourceRules:
-      - apiGroups: ["apps"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["deployments", "statefulsets"]
   (mutations[0].patchType): ApplyConfiguration
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingAdmissionPolicyBinding
 metadata:
-  name: mpol-mount-uw-hosted-kafka-certificate-volume-binding
+  name: mount-uw-hosted-kafka-certificate-volume-binding
 spec:
-  policyName: mpol-mount-uw-hosted-kafka-certificate-volume
+  policyName: mount-uw-hosted-kafka-certificate-volume
