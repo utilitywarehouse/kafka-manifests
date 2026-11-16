@@ -1,28 +1,23 @@
-apiVersion: policies.kyverno.io/v1
-kind: MutatingPolicy
+# Native policies: the admission policies are applied by the API server, the
+# GeneratingPolicies in generate-kafka-certificate.yaml still require Kyverno.
+# Add MSK Certificates as a Volume
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicy
 metadata:
   name: mount-msk-kafka-certificate-volume
-  annotations:
-    policies.kyverno.io/title: Add MSK Certificates as a Volume
-    policies.kyverno.io/category: Sample
-    policies.kyverno.io/subject: Deployment,Volume
 spec:
-  autogen:
-    mutatingAdmissionPolicy:
-      enabled: true
+  failurePolicy: Fail
+  reinvocationPolicy: Never
   matchConstraints:
     resourceRules:
       - apiGroups: ["apps"]
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["deployments", "statefulsets"]
-
   matchConditions:
     - name: match-msk-annotation
-      expression: >
-        has(object.metadata.annotations) && 
-        'uw.systems/msk-kafka-client' in object.metadata.annotations
-
+      expression: >-
+        has(object.metadata.annotations) && 'uw.systems/msk-kafka-client' in object.metadata.annotations
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:
@@ -39,7 +34,7 @@ spec:
                       }
                     }
                   ],
-                  containers: object.spec.template.spec.containers.map(c, 
+                  containers: object.spec.template.spec.containers.map(c,
                     Object.spec.template.spec.containers{
                       name: c.name,
                       volumeMounts: [
@@ -56,31 +51,31 @@ spec:
             }
           }
 ---
-apiVersion: policies.kyverno.io/v1
-kind: MutatingPolicy
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: mount-msk-kafka-certificate-volume-binding
+spec:
+  policyName: mount-msk-kafka-certificate-volume
+---
+# Add UW Hosted Certificates as a Volume
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicy
 metadata:
   name: mount-uw-hosted-kafka-certificate-volume
-  annotations:
-    policies.kyverno.io/title: Add UW Hosted Certificates as a Volume
-    policies.kyverno.io/category: Sample
-    policies.kyverno.io/subject: Deployment,Volume
 spec:
-  autogen:
-    mutatingAdmissionPolicy:
-      enabled: true
+  failurePolicy: Fail
+  reinvocationPolicy: Never
   matchConstraints:
     resourceRules:
       - apiGroups: ["apps"]
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["deployments", "statefulsets"]
-  # Check for the UW Hosted annotation
   matchConditions:
     - name: match-uw-hosted-annotation
-      expression: >
-        has(object.metadata.annotations) && 
-        'uw.systems/uw-hosted-kafka-client' in object.metadata.annotations
-
+      expression: >-
+        has(object.metadata.annotations) && 'uw.systems/uw-hosted-kafka-client' in object.metadata.annotations
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:
@@ -97,7 +92,7 @@ spec:
                       }
                     }
                   ],
-                  containers: object.spec.template.spec.containers.map(c, 
+                  containers: object.spec.template.spec.containers.map(c,
                     Object.spec.template.spec.containers{
                       name: c.name,
                       volumeMounts: [
@@ -113,3 +108,10 @@ spec:
               }
             }
           }
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: mount-uw-hosted-kafka-certificate-volume-binding
+spec:
+  policyName: mount-uw-hosted-kafka-certificate-volume
